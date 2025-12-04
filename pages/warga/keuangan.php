@@ -16,7 +16,7 @@ while ($row = $sql->fetch_assoc()) {
 $saldoAkhir = $totalPemasukan - $totalPengeluaran;
 
 // Ambil semua transaksi keuangan
-$transaksi = $conn->query("SELECT * FROM keuangan ORDER BY tanggal DESC");
+$transaksi = $conn->query("SELECT * FROM keuangan ORDER BY id DESC");
 ?>
 
 <h2 class="text-2xl font-bold mb-2">Transparansi Keuangan</h2>

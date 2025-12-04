@@ -19,9 +19,32 @@ $user_id = $_SESSION['user_id'] ?? null;
 
 // jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nama = $_POST['nama'];
-    $kategori = $_POST['kategori'];
-    $jumlah = preg_replace('/[^0-9]/', '', $_POST['jumlah']); // hilangkan format Rp
+    // Handle cancellation request first
+    if (isset($_POST['cancel_pending'])) {
+        // Ambil ID pembayaran pending user ini
+        $check_stmt = $conn->prepare("SELECT id FROM pembayaran WHERE user_id = ? AND status = 'pending'");
+        $check_stmt->bind_param("i", $user_id);
+        $check_stmt->execute();
+        $check_result = $check_stmt->get_result();
+
+        if ($check_result->num_rows > 0) {
+            $pending_data = $check_result->fetch_assoc();
+            $cancel_stmt = $conn->prepare("UPDATE pembayaran SET status = 'gagal' WHERE id = ?");
+            $cancel_stmt->bind_param("i", $pending_data['id']);
+            $cancel_stmt->execute();
+            $cancel_stmt->close();
+        }
+        $check_stmt->close();
+        
+        // Redirect to refresh page
+        echo "<script>window.location.href = 'dashboard_warga.php?page=pembayaran';</script>";
+        exit;
+    }
+
+    // Normal payment flow
+    $nama = $_POST['nama'] ?? '';
+    $kategori = $_POST['kategori'] ?? '';
+    $jumlah = isset($_POST['jumlah']) ? preg_replace('/[^0-9]/', '', $_POST['jumlah']) : 0;
     $catatan = $_POST['catatan'] ?? '';
 
     if (!$user_id) {
@@ -34,7 +57,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $check_result = $check_stmt->get_result();
 
         if ($check_result->num_rows > 0) {
-            $error = "Anda sudah memiliki pembayaran yang sedang diproses. Harap selesaikan pembayaran sebelumnya.";
+             $error = "Anda sudah memiliki pembayaran yang sedang diproses. <br>
+                      <form method='POST' class='mt-2'>
+                          <input type='hidden' name='cancel_pending' value='1'>
+                          <button type='submit' class='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-sm'>
+                              Batalkan Pembayaran Sebelumnya
+                          </button>
+                      </form>";
         } else {
             // buat parameter transaksi
             $params = [
@@ -129,6 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <script type="text/javascript">
             (function () {
                 const snapToken = '<?= $snapToken ?>';
+                const currentOrderId = '<?= $order_id ?? "" ?>';
 
                 function triggerSnapPay(token) {
                     if (!token) {
@@ -148,12 +178,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 body: 'order_id=' + encodeURIComponent(result.order_id) + '&status=berhasil'
                             })
                             .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    window.location.reload(); // Reload halaman
-                                }
-                            })
-                            .catch(error => console.error('Error:', error));
+                                .then(data => {
+                                    if (data.success) {
+                                        window.location.href = 'dashboard_warga.php?page=pembayaran';
+                                    }
+                                })
+                                .catch(error => console.error('Error:', error));
                         },
                         onPending: function(result){
                             alert("Menunggu pembayaran...");
@@ -164,7 +194,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             console.log(result);
                         },
                         onClose: function(){
-                            alert("Anda menutup popup tanpa menyelesaikan pembayaran");
+                            alert("Anda menutup popup tanpa menyelesaikan pembayaran. Transaksi dibatalkan.");
+                            if (currentOrderId) {
+                                fetch('update_payment_status.php', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                    body: 'order_id=' + encodeURIComponent(currentOrderId) + '&status=gagal'
+                                })
+                                .then(() => {
+                                    window.location.href = 'dashboard_warga.php?page=pembayaran';
+                                });
+                            }
                         }
                     });
                 }
