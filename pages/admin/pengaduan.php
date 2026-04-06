@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../../config/database.php';
 
-// Proses update/hapus (letakkan di paling atas sebelum echo/HTML)
+// Proses update/hapus
 if (isset($_GET['aksi'], $_GET['id'])) {
     $id = intval($_GET['id']);
     $aksi = $_GET['aksi'];
@@ -17,6 +17,9 @@ if (isset($_GET['aksi'], $_GET['id'])) {
     } elseif ($aksi === "hapus") {
         $conn->query("DELETE FROM pengaduan WHERE id=$id");
     }
+    // Redirect to clear GET params
+    header("Location: dashboard_admin.php?page=pengaduan");
+    exit;
 }
 
 // Ambil data pengaduan
@@ -29,47 +32,84 @@ $sql = "
 $result = $conn->query($sql);
 ?>
 
-<h2 class="text-2xl font-bold mb-4">Pengaduan Warga</h2>
-<p class="mb-6 text-gray-600">Kelola pengaduan warga</p>
+<div class="mb-10">
+    <h2 class="text-3xl font-extrabold text-secondary-900 tracking-tight">Pengaduan Warga</h2>
+    <p class="text-secondary-500 mt-1">Kelola dan respon setiap aspirasi maupun laporan dari warga.</p>
+</div>
 
-<div class="bg-white shadow rounded-lg overflow-x-auto">
-    <table class="w-full text-left min-w-[800px]">
-        <thead class="bg-gray-100">
-            <tr>
-                <th class="px-6 py-3">Tanggal</th>
-                <th class="px-6 py-3">Nama</th>
-                <th class="px-6 py-3">Judul</th>
-                <th class="px-6 py-3">Deskripsi</th>
-                <th class="px-6 py-3">Status</th>
-                <th class="px-6 py-3">Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-        <?php while ($row = $result->fetch_assoc()): ?>
-            <tr class="border-t">
-                <td class="px-6 py-3"><?= date('d M Y', strtotime($row['created_at'])) ?></td>
-                <td class="px-6 py-3"><?= htmlspecialchars($row['nama']) ?></td>
-                <td class="px-6 py-3 font-semibold"><?= htmlspecialchars($row['judul']) ?></td>
-                <td class="px-6 py-3"><?= htmlspecialchars($row['isi']) ?></td>
-                <td class="px-6 py-3">
-                    <span class="px-2 py-1 rounded 
-                        <?= $row['status']=='Diterima'?'bg-blue-100 text-blue-600':
-                           ($row['status']=='Diproses'?'bg-yellow-100 text-yellow-600':'bg-green-100 text-green-600') ?>">
-                        <?= $row['status'] ?>
-                    </span>
-                </td>
-                <td class="px-6 py-3 space-x-2">
-                    <?php if ($row['status'] === 'Diterima'): ?>
-                        <a href="dashboard_admin.php?page=pengaduan&aksi=diproses&id=<?= $row['id'] ?>" class="text-yellow-600">Diproses</a>
-                    <?php elseif ($row['status'] === 'Diproses'): ?>
-                        <a href="dashboard_admin.php?page=pengaduan&aksi=selesai&id=<?= $row['id'] ?>" class="text-green-600">Selesai</a>
-                    <?php endif; ?>
-                    <a href="dashboard_admin.php?page=pengaduan&aksi=hapus&id=<?= $row['id'] ?>" 
-                       onclick="return confirm('Yakin hapus pengaduan ini?')" 
-                       class="text-red-600">Hapus</a>
-                </td>
-            </tr>
-        <?php endwhile; ?>
-        </tbody>
-    </table>
+<!-- Table Container -->
+<div class="bg-white rounded-[2rem] shadow-sm border border-secondary-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-secondary-50/50">
+                    <th class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] border-b border-secondary-100">Pelapor</th>
+                    <th class="px-6 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] border-b border-secondary-100">Judul Laporan</th>
+                    <th class="px-6 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] border-b border-secondary-100">Deskripsi</th>
+                    <th class="px-6 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] border-b border-secondary-100">Waktu</th>
+                    <th class="px-6 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] border-b border-secondary-100 text-center">Status</th>
+                    <th class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] border-b border-secondary-100 text-right">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-secondary-50">
+                <?php if($result->num_rows > 0): ?>
+                    <?php while ($row = $result->fetch_assoc()): 
+                        $status = $row['status'];
+                        $color = "blue";
+                        if($status == 'Diproses') $color = "yellow";
+                        if($status == 'Selesai') $color = "green";
+                    ?>
+                    <tr class="group hover:bg-primary-50/30 transition-all duration-300">
+                        <td class="px-8 py-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-secondary-100 flex items-center justify-center text-secondary-500 font-bold shrink-0">
+                                    <?= substr($row['nama'], 0, 1) ?>
+                                </div>
+                                <p class="font-bold text-secondary-900"><?= htmlspecialchars($row['nama']) ?></p>
+                            </div>
+                        </td>
+                        <td class="px-6 py-6 font-bold text-secondary-800 tracking-tight"><?= htmlspecialchars($row['judul']) ?></td>
+                        <td class="px-6 py-6">
+                            <p class="text-sm text-secondary-500 line-clamp-2 max-w-xs"><?= htmlspecialchars($row['isi']) ?></p>
+                        </td>
+                        <td class="px-6 py-6">
+                            <p class="text-xs font-medium text-secondary-400">
+                                <?php
+                                $bulan = ['Jan' => 'Jan', 'Feb' => 'Feb', 'Mar' => 'Mar', 'Apr' => 'Apr', 'May' => 'Mei', 'Jun' => 'Jun', 'Jul' => 'Jul', 'Aug' => 'Agt', 'Sep' => 'Sep', 'Oct' => 'Okt', 'Nov' => 'Nov', 'Dec' => 'Des'];
+                                echo strtr(date('d M Y, H:i', strtotime($row['created_at'])), $bulan);
+                                ?>
+                            </p>
+                        </td>
+                        <td class="px-6 py-6 text-center">
+                            <span class="inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-<?= $color ?>-100 text-<?= $color ?>-600 ring-4 ring-<?= $color ?>-50">
+                                <?= $status ?>
+                            </span>
+                        </td>
+                        <td class="px-8 py-6 text-right whitespace-nowrap">
+                            <div class="flex items-center justify-end gap-2">
+                                <?php if ($status === 'Diterima'): ?>
+                                    <a href="dashboard_admin.php?page=pengaduan&aksi=diproses&id=<?= $row['id'] ?>" class="px-4 py-2 bg-yellow-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-600 transition-all shadow-lg shadow-yellow-500/20">Proses</a>
+                                <?php elseif ($status === 'Diproses'): ?>
+                                    <a href="dashboard_admin.php?page=pengaduan&aksi=selesai&id=<?= $row['id'] ?>" class="px-4 py-2 bg-green-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-green-600 transition-all shadow-lg shadow-green-500/20">Selesai</a>
+                                <?php endif; ?>
+                                <a href="dashboard_admin.php?page=pengaduan&aksi=hapus&id=<?= $row['id'] ?>" 
+                                   onclick="return confirm('Hapus laporan pengaduan ini?')" 
+                                   class="p-2 text-secondary-300 hover:text-red-500 transition-colors">
+                                   <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="6" class="px-8 py-20 text-center">
+                            <i class="fas fa-comment-slash text-6xl text-secondary-100 mb-4 block"></i>
+                            <p class="text-secondary-400 font-bold">Belum ada pengaduan warga.</p>
+                        </td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 </div>

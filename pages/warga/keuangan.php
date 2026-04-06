@@ -1,5 +1,5 @@
 <?php
-include __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../config/database.php';
 
 // Hitung total pemasukan, pengeluaran, saldo
 $totalPemasukan = 0;
@@ -29,11 +29,15 @@ if (!empty($filter_jenis) && $filter_jenis != 'semua') {
 }
 
 if (!empty($filter_bulan) && $filter_bulan != 'semua') {
-    list($tahun, $bulan) = explode('-', $filter_bulan);
-    $where[] = "MONTH(tanggal) = ? AND YEAR(tanggal) = ?";
-    $params[] = $bulan;
-    $params[] = $tahun;
-    $types .= 'ii';
+    $parts = explode('-', $filter_bulan);
+    if(count($parts) == 2) {
+        $tahun = $parts[0];
+        $bulan = $parts[1];
+        $where[] = "MONTH(tanggal) = ? AND YEAR(tanggal) = ?";
+        $params[] = $bulan;
+        $params[] = $tahun;
+        $types .= 'ii';
+    }
 }
 
 $whereClause = count($where) > 0 ? "WHERE " . implode(" AND ", $where) : "";
@@ -46,94 +50,137 @@ $stmt_transaksi->execute();
 $transaksi = $stmt_transaksi->get_result();
 ?>
 
-<h2 class="text-2xl font-bold mb-2">Transparansi Keuangan</h2>
-<p class="text-gray-600 mb-6">Informasi keuangan RT secara transparan</p>
-
-<div class="grid md:grid-cols-3 gap-6 mb-6">
-    <div class="bg-white p-6 rounded-lg shadow">
-        <p>Total Pemasukan</p>
-        <h3 class="text-xl font-bold text-green-600">Rp <?= number_format($totalPemasukan, 0, ',', '.'); ?></h3>
-    </div>
-    <div class="bg-white p-6 rounded-lg shadow">
-        <p>Total Pengeluaran</p>
-        <h3 class="text-xl font-bold text-red-600">Rp <?= number_format($totalPengeluaran, 0, ',', '.'); ?></h3>
-    </div>
-    <div class="bg-white p-6 rounded-lg shadow">
-        <p>Saldo Akhir</p>
-        <h3 class="text-xl font-bold text-blue-600">Rp <?= number_format($saldoAkhir, 0, ',', '.'); ?></h3>
+<div class="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+        <h2 class="text-3xl font-extrabold text-secondary-900 tracking-tight">Transparansi Dana</h2>
+        <p class="text-secondary-500 mt-1">Laporan arus kas RT 06/08 secara terbuka dan akuntabel.</p>
     </div>
 </div>
 
-<form method="GET" action="dashboard_warga.php" class="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0 mb-6 w-full">
-    <input type="hidden" name="page" value="keuangan">
-    <select name="filter_bulan" class="border rounded-lg px-4 py-2 w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <option value="semua" <?= ($filter_bulan == 'semua' || empty($filter_bulan)) ? 'selected' : '' ?>>Semua Waktu</option>
-        <?php
-        for ($i = 0; $i < 12; $i++) {
-            $time = strtotime("first day of -$i months");
-            $val = date('Y-m', $time);
-            $label = date('F Y', $time);
-            $bulanindo = ['January' => 'Januari', 'February' => 'Februari', 'March' => 'Maret', 'April' => 'April', 'May' => 'Mei', 'June' => 'Juni', 'July' => 'Juli', 'August' => 'Agustus', 'September' => 'September', 'October' => 'Oktober', 'November' => 'November', 'December' => 'Desember'];
-            $label = strtr($label, $bulanindo);
-            $selected = ($filter_bulan == $val) ? 'selected' : '';
-            echo "<option value='$val' $selected>$label</option>";
-        }
-        ?>
-    </select>
-    <select name="filter_jenis" class="border rounded-lg px-4 py-2 w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <option value="semua" <?= ($filter_jenis == 'semua' || empty($filter_jenis)) ? 'selected' : '' ?>>Semua Jenis</option>
-        <option value="pemasukan" <?= $filter_jenis == 'pemasukan' ? 'selected' : '' ?>>Pemasukan</option>
-        <option value="pengeluaran" <?= $filter_jenis == 'pengeluaran' ? 'selected' : '' ?>>Pengeluaran</option>
-    </select>
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full sm:w-auto font-bold shadow-sm transition">
-        <i class="fas fa-filter mr-1"></i> Terapkan Filter
-    </button>
-</form>
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-secondary-100 flex items-center gap-4">
+        <div class="w-12 h-12 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center shadow-inner shrink-0">
+            <i class="fas fa-arrow-down-long text-lg"></i>
+        </div>
+        <div>
+            <p class="text-secondary-400 text-[10px] font-black uppercase tracking-widest">Total Masuk</p>
+            <p class="text-xl font-black text-secondary-900">Rp <?= number_format($totalPemasukan, 0, ',', '.'); ?></p>
+        </div>
+    </div>
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-secondary-100 flex items-center gap-4">
+        <div class="w-12 h-12 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center shadow-inner shrink-0">
+            <i class="fas fa-arrow-up-long text-lg"></i>
+        </div>
+        <div>
+            <p class="text-secondary-400 text-[10px] font-black uppercase tracking-widest">Total Keluar</p>
+            <p class="text-xl font-black text-secondary-900">Rp <?= number_format($totalPengeluaran, 0, ',', '.'); ?></p>
+        </div>
+    </div>
+    <div class="bg-primary-900 p-6 rounded-3xl shadow-xl flex items-center gap-4 relative overflow-hidden group">
+        <div class="absolute -right-4 -top-4 w-20 h-20 bg-primary-500/20 rounded-full group-hover:scale-150 transition-transform"></div>
+        <div class="w-12 h-12 bg-primary-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-primary-500/30 shrink-0 relative z-10">
+            <i class="fas fa-wallet text-lg"></i>
+        </div>
+        <div class="relative z-10">
+            <p class="text-secondary-300 text-[10px] font-black uppercase tracking-widest">Saldo Kas RT</p>
+            <p class="text-xl font-black text-white">Rp <?= number_format($saldoAkhir, 0, ',', '.'); ?></p>
+        </div>
+    </div>
+</div>
 
-<div class="bg-white p-6 rounded-lg shadow overflow-x-auto">
-    <h3 class="font-bold mb-4">Riwayat Transaksi</h3>
-    <table class="w-full text-left min-w-[700px]">
-        <thead class="bg-gray-100">
-            <tr>
-                <th class="p-2">Nama</th>
-                <th class="p-2">Tanggal</th>
-                <th class="p-2">Kategori</th>
-                <th class="p-2">Jenis</th>
-                <th class="p-2">Jumlah</th>
-                <th class="p-2">Keterangan</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while ($row = $transaksi->fetch_assoc()): ?>
-                <tr class="border-t">
-                    <?php 
-                        $nama_warga = '-';
-                        $kategori = '-';
-                        $keterangan_tampil = $row['keterangan'];
+<!-- Filter Bar -->
+<div class="bg-white p-6 rounded-[2rem] shadow-sm border border-secondary-100 mb-8">
+    <form method="GET" action="dashboard_warga.php" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <input type="hidden" name="page" value="keuangan">
+        
+        <div>
+            <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Jenis Dana</label>
+            <select name="filter_jenis" class="w-full px-4 py-3 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium">
+                <option value="semua" <?= ($filter_jenis == 'semua' || empty($filter_jenis)) ? 'selected' : '' ?>>Semua Transaksi</option>
+                <option value="pemasukan" <?= $filter_jenis == 'pemasukan' ? 'selected' : '' ?>>Pemasukan</option>
+                <option value="pengeluaran" <?= $filter_jenis == 'pengeluaran' ? 'selected' : '' ?>>Pengeluaran</option>
+            </select>
+        </div>
+
+        <div class="md:col-span-2">
+            <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Periode</label>
+            <select name="filter_bulan" class="w-full px-4 py-3 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium">
+                <option value="semua" <?= ($filter_bulan == 'semua' || empty($filter_bulan)) ? 'selected' : '' ?>>Seluruh Riwayat</option>
+                <?php
+                for ($i = 0; $i < 12; $i++) {
+                    $time = strtotime("first day of -$i months");
+                    $val = date('Y-m', $time);
+                    $label = date('F Y', $time);
+                    $bulanindo = ['January' => 'Januari', 'February' => 'Februari', 'March' => 'Maret', 'April' => 'April', 'May' => 'Mei', 'June' => 'Juni', 'July' => 'Juli', 'August' => 'Agustus', 'September' => 'September', 'October' => 'Oktober', 'November' => 'November', 'December' => 'Desember'];
+                    $label = strtr($label, $bulanindo);
+                    $selected = ($filter_bulan == $val) ? 'selected' : '';
+                    echo "<option value='$val' $selected>$label</option>";
+                }
+                ?>
+            </select>
+        </div>
+
+        <button type="submit" class="w-full px-6 py-3 bg-secondary-900 text-white font-black rounded-2xl hover:bg-secondary-800 transition-all active:scale-95">
+            FILTER DATA
+        </button>
+    </form>
+</div>
+
+<!-- Table Container -->
+<div class="bg-white rounded-[2rem] shadow-sm border border-secondary-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-secondary-50/50">
+                    <th class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] border-b border-secondary-100">Nama/Subjek</th>
+                    <th class="px-6 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] border-b border-secondary-100">Tanggal</th>
+                    <th class="px-6 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] border-b border-secondary-100 text-right">Jumlah</th>
+                    <th class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] border-b border-secondary-100">Keterangan</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-secondary-50">
+                <?php if($transaksi->num_rows > 0): ?>
+                    <?php while ($row = $transaksi->fetch_assoc()): 
+                        $isInc = ($row['jenis'] == 'pemasukan');
+                        $color = $isInc ? "green" : "red";
                         
                         $parts = explode(' - ', $row['keterangan'], 3);
-                        if (count($parts) >= 2) {
-                            $nama_warga = $parts[0];
-                            $kategori = $parts[1];
-                            $keterangan_tampil = isset($parts[2]) ? $parts[2] : '-';
-                        }
+                        $name = $parts[0] ?? '-';
+                        $cat = $parts[1] ?? '-';
+                        $note = $parts[2] ?? '-';
                     ?>
-                    <td class="p-2"><?= htmlspecialchars($nama_warga) ?></td>
-                    <td class="p-2"><?= date('d M Y', strtotime($row['tanggal'])) ?></td>
-                    <td class="p-2"><?= htmlspecialchars($kategori) ?></td>
-                    <td class="p-2">
-                        <?php if ($row['jenis'] == 'pemasukan'): ?>
-                            <span class="bg-green-100 text-green-600 px-2 py-1 rounded">Pemasukan</span>
-                        <?php else: ?>
-                            <span class="bg-red-100 text-red-600 px-2 py-1 rounded">Pengeluaran</span>
-                        <?php endif; ?>
-                    </td>
-                    <td class="p-2 font-bold <?= $row['jenis']=='pemasukan'?'text-green-600': 'text-red-600' ?>">
-                        <?= $row['jenis']=='pemasukan' ? '+ ' : '- ' ?>Rp <?= number_format($row['jumlah'], 0, ',', '.'); ?>
-                    </td>
-                    <td class="p-2"><?= htmlspecialchars($keterangan_tampil) ?></td>
-                </tr>
-            <?php endwhile; ?>
-        </tbody>
-    </table>
+                    <tr class="group hover:bg-primary-50/20 transition-all">
+                        <td class="px-8 py-5">
+                            <p class="font-bold text-secondary-900 leading-tight"><?= htmlspecialchars($name) ?></p>
+                            <span class="text-[10px] font-black text-secondary-400 uppercase tracking-widest"><?= htmlspecialchars($cat) ?></span>
+                        </td>
+                        <td class="px-6 py-5">
+                            <p class="text-sm font-medium text-secondary-500">
+                                <?php
+                                $bulanIndoShort = ['Jan' => 'Jan', 'Feb' => 'Feb', 'Mar' => 'Mar', 'Apr' => 'Apr', 'May' => 'Mei', 'Jun' => 'Jun', 'Jul' => 'Jul', 'Aug' => 'Agt', 'Sep' => 'Sep', 'Oct' => 'Okt', 'Nov' => 'Nov', 'Dec' => 'Des'];
+                                echo strtr(date('d M Y', strtotime($row['tanggal'])), $bulanIndoShort);
+                                ?>
+                            </p>
+                        </td>
+                        <td class="px-6 py-5 text-right">
+                            <p class="font-black text-<?= $color ?>-600">
+                                <?= $isInc ? '+' : '-' ?> Rp <?= number_format($row['jumlah'], 0, ',', '.'); ?>
+                            </p>
+                        </td>
+                        <td class="px-8 py-5">
+                            <p class="text-xs text-secondary-400 italic line-clamp-1"><?= htmlspecialchars($note) ?></p>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="4" class="px-8 py-20 text-center text-secondary-400 font-bold">
+                            Tidak ada catatan keuangan ditemukan.
+                        </td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
