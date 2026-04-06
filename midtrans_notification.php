@@ -13,7 +13,7 @@ $order_id = $notif->order_id;
 $status_code = $notif->status_code;
 
 // Cari pembayaran berdasarkan order_id
-$stmt = $conn->prepare("SELECT id, user_id, jumlah FROM pembayaran WHERE order_id = ?");
+$stmt = $conn->prepare("SELECT id, user_id, jumlah, kategori, metode FROM pembayaran WHERE order_id = ?");
 $stmt->bind_param("s", $order_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -23,6 +23,16 @@ if ($result->num_rows > 0) {
     $pembayaran_id = $pembayaran['id'];
     $user_id = $pembayaran['user_id'];
     $jumlah = $pembayaran['jumlah'];
+    $kategori = $pembayaran['kategori'];
+    $metode = $pembayaran['metode'];
+
+    // Ambil nama pembayar dari tabel users
+    $user_stmt = $conn->prepare("SELECT nama FROM users WHERE id = ?");
+    $user_stmt->bind_param("i", $user_id);
+    $user_stmt->execute();
+    $user_result = $user_stmt->get_result();
+    $nama = $user_result->num_rows > 0 ? $user_result->fetch_assoc()['nama'] : 'Unknown';
+    $user_stmt->close();
 
     // Update status pembayaran
     if ($transaction == 'capture') {
@@ -52,7 +62,7 @@ if ($result->num_rows > 0) {
 
     // Jika berhasil, tambahkan ke keuangan sebagai pemasukan (hindari duplikasi)
     if ($status == 'berhasil') {
-        $keterangan = "Pembayaran dari warga - Order ID: $order_id";
+        $keterangan = "$nama - $kategori - $metode";
         $cek_keuangan = $conn->prepare("SELECT id FROM keuangan WHERE keterangan = ?");
         $cek_keuangan->bind_param("s", $keterangan);
         $cek_keuangan->execute();

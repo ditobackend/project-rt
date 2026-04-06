@@ -97,8 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // simpan pembayaran ke database
             if ($snapToken) {
                 $order_id = $params['transaction_details']['order_id'];
-                $stmt = $conn->prepare("INSERT INTO pembayaran (user_id, jumlah, metode, status, order_id) VALUES (?, ?, 'midtrans', 'pending', ?)");
-                $stmt->bind_param("iis", $user_id, $jumlah, $order_id);
+                $stmt = $conn->prepare("INSERT INTO pembayaran (user_id, jumlah, metode, status, order_id, kategori) VALUES (?, ?, 'midtrans', 'pending', ?, ?)");
+                $stmt->bind_param("iiss", $user_id, $jumlah, $order_id, $kategori);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -131,8 +131,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <input type="text" id="jumlah" name="jumlah" placeholder="Jumlah Pembayaran" required class="w-full border rounded px-4 py-2">
 
             <select class="w-full border rounded px-4 py-2">
-                <option>Pilih metode</option>
-                <option selected>Midtrans Payment Gateway</option>
+                <option>Pilih Metode</option>
+                <option selected>Transfer</option>
             </select>
 
             <textarea name="catatan" placeholder="Catatan (Opsional)" class="w-full border rounded px-4 py-2"></textarea>
