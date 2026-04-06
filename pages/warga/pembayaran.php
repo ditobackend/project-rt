@@ -97,8 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // simpan pembayaran ke database
             if ($snapToken) {
                 $order_id = $params['transaction_details']['order_id'];
-                $stmt = $conn->prepare("INSERT INTO pembayaran (user_id, jumlah, metode, status, order_id, kategori) VALUES (?, ?, 'midtrans', 'pending', ?, ?)");
-                $stmt->bind_param("iiss", $user_id, $jumlah, $order_id, $kategori);
+                $stmt = $conn->prepare("INSERT INTO pembayaran (user_id, jumlah, metode, status, order_id, kategori, catatan) VALUES (?, ?, 'midtrans', 'pending', ?, ?, ?)");
+                $stmt->bind_param("iisss", $user_id, $jumlah, $order_id, $kategori, $catatan);
                 $stmt->execute();
                 $stmt->close();
             }

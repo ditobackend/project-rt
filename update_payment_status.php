@@ -15,14 +15,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Jika berhasil, ambil data dan tambahkan ke keuangan
         if ($status == 'berhasil') {
-            $select_stmt = $conn->prepare("SELECT user_id, jumlah FROM pembayaran WHERE order_id = ?");
+            $select_stmt = $conn->prepare("SELECT user_id, jumlah, kategori, metode, catatan FROM pembayaran WHERE order_id = ?");
             $select_stmt->bind_param("s", $order_id);
             $select_stmt->execute();
             $result = $select_stmt->get_result();
             if ($result->num_rows > 0) {
                 $data = $result->fetch_assoc();
+                $user_id = $data['user_id'];
                 $jumlah = $data['jumlah'];
-                $keterangan = "Pembayaran dari warga - Order ID: $order_id";
+                $kategori = $data['kategori'];
+                $metode = $data['metode'];
+                $catatan = $data['catatan'] ?: '-';
+                
+                $user_stmt = $conn->prepare("SELECT nama FROM users WHERE id = ?");
+                $user_stmt->bind_param("i", $user_id);
+                $user_stmt->execute();
+                $user_res = $user_stmt->get_result();
+                $nama = $user_res->num_rows > 0 ? $user_res->fetch_assoc()['nama'] : 'Unknown';
+                $user_stmt->close();
+                
+                $keterangan = "$nama - $kategori - $catatan";
                 $cek_keuangan = $conn->prepare("SELECT id FROM keuangan WHERE keterangan = ?");
                 $cek_keuangan->bind_param("s", $keterangan);
                 $cek_keuangan->execute();

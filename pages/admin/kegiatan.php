@@ -67,10 +67,15 @@ if (!empty($_GET['cari'])) {
 
 // filter status
 if (!empty($_GET['status'])) {
-    $where[] = "status = ?";
-    $params[] = $_GET['status'];
-    $types .= "s";
+    if ($_GET['status'] == 'akan_datang') {
+        $where[] = "NOW() < CONCAT(tanggal, ' ', jam_mulai)";
+    } elseif ($_GET['status'] == 'berlangsung') {
+        $where[] = "NOW() >= CONCAT(tanggal, ' ', jam_mulai) AND NOW() <= CONCAT(tanggal, ' ', jam_selesai)";
+    }
 }
+
+// Sembunyikan otomatis jika sesi jam sudah melewati waktu real-time
+$where[] = "CONCAT(tanggal, ' ', jam_selesai) >= NOW()";
 
 $sql = "SELECT * FROM kegiatan";
 if ($where) {
@@ -115,8 +120,7 @@ $result = $stmt->get_result();
         <select name="status" class="border px-3 py-2 rounded-lg w-full sm:w-auto">
             <option value="">Semua Status</option>
             <option value="akan_datang" <?= (isset($_GET['status']) && $_GET['status']=='akan_datang') ? 'selected' : '' ?>>Akan Datang</option>
-            <option value="berlangsung" <?= (isset($_GET['status']) && $_GET['status']=='berlangsung') ? 'selected' : '' ?>>Berlangsung</option>
-            <option value="selesai" <?= (isset($_GET['status']) && $_GET['status']=='selesai') ? 'selected' : '' ?>>Selesai</option>
+            <option value="berlangsung" <?= (isset($_GET['status']) && $_GET['status']=='berlangsung') ? 'selected' : '' ?>>Sedang Berlangsung</option>
         </select>
 
         <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg w-full sm:w-auto">
@@ -150,10 +154,8 @@ $result = $stmt->get_result();
                 <input type="time" name="jam_selesai" class="border px-3 py-2 rounded w-1/2" required>
             </div>
             <input type="text" name="penyelenggara" placeholder="Penyelenggara" class="border px-3 py-2 rounded w-full mb-2">
-            <select name="status" class="border px-3 py-2 rounded w-full mb-2">
+            <select name="status" class="border px-3 py-2 rounded w-full mb-2 bg-gray-100 cursor-not-allowed pointer-events-none" tabindex="-1">
                 <option value="akan_datang">Akan Datang</option>
-                <option value="berlangsung">Berlangsung</option>
-                <option value="selesai">Selesai</option>
             </select>
             <div class="flex justify-end space-x-2 mt-4">
                 <button type="button" id="btnCloseTambah" class="px-4 py-2 rounded bg-gray-300">Batal</button>
@@ -191,13 +193,21 @@ $result = $stmt->get_result();
                 </td>
                 <td class="px-6 py-3">
                     <?php
-                        $color = "gray";
-                        if($row['status']=="berlangsung") $color="green";
-                        elseif($row['status']=="akan_datang") $color="blue";
-                        elseif($row['status']=="selesai") $color="red";
+                        date_default_timezone_set('Asia/Jakarta');
+                        $now = time();
+                        $start_time = strtotime($row['tanggal'] . ' ' . $row['jam_mulai']);
+                        $end_time = strtotime($row['tanggal'] . ' ' . $row['jam_selesai']);
+                        
+                        if ($now >= $start_time && $now <= $end_time) {
+                            $color = "green";
+                            $display_status = "Sedang Berlangsung";
+                        } else {
+                            $color = "blue";
+                            $display_status = "Akan Datang";
+                        }
                     ?>
                     <span class="bg-<?= $color ?>-100 text-<?= $color ?>-600 px-2 py-1 rounded">
-                        <?= ucwords(str_replace("_"," ", $row['status'])) ?>
+                        <?= $display_status ?>
                     </span>
                 </td>
                 <?php if(isset($_SESSION['role']) && $_SESSION['role']=="admin"): ?>
@@ -240,10 +250,9 @@ $result = $stmt->get_result();
                 <input type="time" name="jam_selesai" id="editJamSelesai" class="border px-3 py-2 rounded w-1/2" required>
             </div>
             <input type="text" name="penyelenggara" id="editPenyelenggara" placeholder="Penyelenggara" class="border px-3 py-2 rounded w-full mb-2">
-            <select name="status" id="editStatus" class="border px-3 py-2 rounded w-full mb-2">
+            <!-- Status dikalkulasikan otomatis -> Input dibekukan -->
+            <select name="status" id="editStatus" class="border px-3 py-2 rounded w-full mb-2 bg-gray-100 pointer-events-none" tabindex="-1">
                 <option value="akan_datang">Akan Datang</option>
-                <option value="berlangsung">Berlangsung</option>
-                <option value="selesai">Selesai</option>
             </select>
             <div class="flex justify-end space-x-2 mt-4">
                 <button type="button" id="btnCloseEdit" class="px-4 py-2 rounded bg-gray-300">Batal</button>

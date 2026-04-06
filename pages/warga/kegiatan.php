@@ -10,10 +10,15 @@ $types = "";
 $statusFilter = $_GET['status'] ?? "";
 $bulanFilter = $_GET['bulan'] ?? "";
 
+// Sembunyikan otomatis jika sesi jam sudah melewati waktu real-time
+$where[] = "CONCAT(tanggal, ' ', jam_selesai) >= NOW()";
+
 if (!empty($statusFilter)) {
-    $where[] = "status = ?";
-    $params[] = $statusFilter;
-    $types .= "s";
+    if ($statusFilter == 'akan_datang') {
+        $where[] = "NOW() < CONCAT(tanggal, ' ', jam_mulai)";
+    } elseif ($statusFilter == 'berlangsung') {
+        $where[] = "NOW() >= CONCAT(tanggal, ' ', jam_mulai) AND NOW() <= CONCAT(tanggal, ' ', jam_selesai)";
+    }
 }
 
 if (!empty($bulanFilter)) {
@@ -47,8 +52,7 @@ $result = $stmt->get_result();
         <select name="status" class="border rounded px-4 py-2 w-full md:w-auto">
             <option value="">Semua Status</option>
             <option value="akan_datang" <?= ($statusFilter=="akan_datang") ? 'selected' : '' ?>>Akan Datang</option>
-            <option value="berlangsung" <?= ($statusFilter=="berlangsung") ? 'selected' : '' ?>>Berlangsung</option>
-            <option value="selesai" <?= ($statusFilter=="selesai") ? 'selected' : '' ?>>Selesai</option>
+            <option value="berlangsung" <?= ($statusFilter=="berlangsung") ? 'selected' : '' ?>>Sedang Berlangsung</option>
         </select>
 
         <select name="bulan" class="border rounded px-4 py-2 w-full md:w-auto">
@@ -73,19 +77,18 @@ if ($result && $result->num_rows > 0):
         // Ambil status langsung dari database
         $status = $row['status'] ?? 'tidak_diketahui';
 
-        // Tentukan warna badge
-        if ($status === "berlangsung") {
+        // Tentukan warna badge secara otomatis berdasarkan real-time
+        date_default_timezone_set('Asia/Jakarta');
+        $now = time();
+        $start_time = strtotime($row['tanggal'] . ' ' . $row['jam_mulai']);
+        $end_time = strtotime($row['tanggal'] . ' ' . $row['jam_selesai']);
+        
+        if ($now >= $start_time && $now <= $end_time) {
             $badge = "bg-green-100 text-green-600";
-            $statusLabel = "Berlangsung";
-        } elseif ($status === "akan_datang") {
+            $statusLabel = "Sedang Berlangsung";
+        } else {
             $badge = "bg-blue-100 text-blue-600";
             $statusLabel = "Akan Datang";
-        } elseif ($status === "selesai") {
-            $badge = "bg-red-100 text-red-600";
-            $statusLabel = "Selesai";
-        } else {
-            $badge = "bg-gray-100 text-gray-600";
-            $statusLabel = "Tidak Diketahui";
         }
 ?>
 <div class="bg-white p-6 rounded-lg shadow mb-4">
