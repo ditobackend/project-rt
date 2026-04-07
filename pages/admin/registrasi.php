@@ -103,10 +103,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     </thead>
                     <tbody class="divide-y divide-secondary-50">
                         <?php
-                        $result = mysqli_query($conn, "SELECT nama, email, role FROM users ORDER BY id DESC");
+                        $result = mysqli_query($conn, "SELECT nama, email, role FROM users WHERE role = 'warga' ORDER BY id DESC");
                         if (mysqli_num_rows($result) > 0) {
                             while ($row = mysqli_fetch_assoc($result)) {
                                 $avatar = substr($row['nama'], 0, 1);
+                                $roleDisplay = ucfirst($row['role']);
                                 echo "<tr class='group hover:bg-primary-50/30 transition-all'>
                                         <td class='px-8 py-5'>
                                             <div class='flex items-center gap-3'>
@@ -116,7 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                         </td>
                                         <td class='px-6 py-5 text-sm text-secondary-500 font-medium'>{$row['email']}</td>
                                         <td class='px-8 py-5 text-right'>
-                                            <span class='text-[10px] font-black uppercase tracking-widest text-primary-600 bg-primary-50 px-3 py-1 rounded-full'>Warga</span>
+                                            <span class='text-[10px] font-black uppercase tracking-widest text-primary-600 bg-primary-50 px-3 py-1 rounded-full'>$roleDisplay</span>
                                         </td>
                                       </tr>";
                             }

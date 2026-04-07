@@ -198,19 +198,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     const snapToken = '<?= $snapToken ?>';
                     const currentOrderId = '<?= $order_id ?? "" ?>';
 
+                    function updatePaymentStatus(orderId, status, callback) {
+                        fetch('<?= (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] ?>/update_payment_status.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: 'order_id=' + encodeURIComponent(orderId) + '&status=' + encodeURIComponent(status)
+                        })
+                        .then(res => res.json())
+                        .then(data => { if (callback) callback(data); })
+                        .catch(err => { console.error('Update status error:', err); if (callback) callback(null); });
+                    }
+
                     function triggerSnapPay(token) {
                         if (!token) return;
                         snap.pay(token, {
                             onSuccess: function(result){
-                                Swal.fire('Berhasil!', 'Pembayaran telah diterima.', 'success').then(() => {
-                                    window.location.href = 'dashboard_warga.php?page=pembayaran';
+                                updatePaymentStatus(currentOrderId, 'berhasil', function() {
+                                    Swal.fire('Berhasil!', 'Pembayaran telah diterima.', 'success').then(() => {
+                                        window.location.href = 'dashboard_warga.php?page=pembayaran';
+                                    });
                                 });
                             },
                             onPending: function(result){
                                 Swal.fire('Menunggu!', 'Lengkapi pembayaran Anda.', 'info');
                             },
                             onError: function(result){
-                                Swal.fire('Gagal!', 'Terjadi kesalahan sistem.', 'error');
+                                updatePaymentStatus(currentOrderId, 'gagal', function() {
+                                    Swal.fire('Gagal!', 'Terjadi kesalahan sistem.', 'error');
+                                });
                             },
                             onClose: function(){
                                 console.log('Snap closed');

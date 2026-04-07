@@ -1,4 +1,5 @@
 <?php
+ob_start();
 // Mulai session
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -243,3 +244,4 @@ $page = $_GET['page'] ?? 'dashboard';
     </script>
 
     <?php include 'includes/footer.php'; ?>
+<?php ob_end_flush(); ?>
