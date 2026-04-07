@@ -185,13 +185,6 @@ $queryAktivitas = $conn->query("SELECT * FROM keuangan ORDER BY tanggal DESC, id
             </div>
         </div>
 
-        <!-- Quick Help -->
-        <div class="bg-primary-50 p-6 rounded-[2rem] border border-primary-100">
-            <h4 class="font-bold text-primary-900 mb-2">Butuh Bantuan?</h4>
-            <p class="text-sm text-primary-700/70 mb-4 leading-relaxed">Akses panduan pengelolaan RT atau hubungi tim teknis jika ada kendala.</p>
-            <button class="text-sm font-black text-primary-600 flex items-center hover:translate-x-1 transition-transform">
-                Baca Dokumentasi <i class="fas fa-arrow-right ml-2"></i>
-            </button>
-        </div>
+
     </div>
 </div>

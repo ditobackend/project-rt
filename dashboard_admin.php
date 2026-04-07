@@ -23,7 +23,8 @@ $page = $_GET['page'] ?? 'dashboard';
 
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar Desktop -->
-        <aside class="hidden md:flex flex-col w-72 bg-secondary-900 text-white transition-all duration-300 ease-in-out z-30">
+        <aside
+            class="hidden md:flex flex-col w-72 bg-secondary-900 text-white transition-all duration-300 ease-in-out z-30">
             <div class="p-8">
                 <div class="flex items-center space-x-3 mb-10">
                     <div class="bg-primary-500 p-2 rounded-xl shadow-lg shadow-primary-500/30">
@@ -33,27 +34,33 @@ $page = $_GET['page'] ?? 'dashboard';
                 </div>
 
                 <nav class="space-y-2">
-                    <a href="?page=dashboard" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page=='dashboard'?'sidebar-active':'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
+                    <a href="?page=dashboard"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'dashboard' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
                         <i class="fas fa-tachometer-alt w-6"></i>
                         <span class="font-medium">Dashboard Utama</span>
                     </a>
-                    <a href="?page=kegiatan" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page=='kegiatan'?'sidebar-active':'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
+                    <a href="?page=kegiatan"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
                         <i class="fas fa-calendar-alt w-6"></i>
                         <span class="font-medium">Data Kegiatan</span>
                     </a>
-                    <a href="?page=keuangan" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page=='keuangan'?'sidebar-active':'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
+                    <a href="?page=keuangan"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'keuangan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
                         <i class="fas fa-chart-line w-6"></i>
                         <span class="font-medium">Data Keuangan</span>
                     </a>
-                    <a href="?page=pengaduan" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page=='pengaduan'?'sidebar-active':'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
+                    <a href="?page=pengaduan"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'pengaduan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
                         <i class="fas fa-comment-dots w-6"></i>
                         <span class="font-medium">Pengaduan Warga</span>
                     </a>
-                    <a href="?page=registrasi" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page=='registrasi'?'sidebar-active':'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
+                    <a href="?page=registrasi"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'registrasi' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
                         <i class="fas fa-user-plus w-6"></i>
                         <span class="font-medium">Registrasi Warga</span>
                     </a>
-                    <a href="?page=laporan" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page=='laporan'?'sidebar-active':'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
+                    <a href="?page=laporan"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'laporan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
                         <i class="fas fa-file-alt w-6"></i>
                         <span class="font-medium">Laporan Akuntansi</span>
                     </a>
@@ -61,9 +68,10 @@ $page = $_GET['page'] ?? 'dashboard';
             </div>
 
             <div class="mt-auto p-8">
-                <button onclick="confirmLogout()" class="flex items-center space-x-3 px-4 py-3 w-full rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                <button onclick="confirmLogout()"
+                    class="flex items-center space-x-3 px-4 py-3 w-full rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
                     <i class="fas fa-sign-out-alt w-6"></i>
-                    <span class="font-medium">Keluar Sistem</span>
+                    <span class="font-medium">Keluar</span>
                 </button>
             </div>
         </aside>
@@ -78,7 +86,7 @@ $page = $_GET['page'] ?? 'dashboard';
                     </button>
                     <span class="ml-4 font-bold text-lg">Portal Admin</span>
                 </div>
-                
+
                 <div class="hidden md:block">
                     <h2 class="text-secondary-500 text-sm font-medium">Selamat datang kembali,</h2>
                     <p class="text-secondary-900 font-bold block"><?= $_SESSION['user_nama'] ?? 'Admin RT 06' ?></p>
@@ -94,7 +102,8 @@ $page = $_GET['page'] ?? 'dashboard';
                         <p class="text-xs text-secondary-500"><?= $date_str ?></p>
                         <p class="text-xs font-bold text-primary-600">RT 06/08 Serua Indah</p>
                     </div>
-                    <div class="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold shadow-sm ring-2 ring-white">
+                    <div
+                        class="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold shadow-sm ring-2 ring-white">
                         <?= strtoupper(substr($_SESSION['user_nama'] ?? 'A', 0, 1)) . strtoupper(substr(explode(' ', $_SESSION['user_nama'] ?? 'Admin')[1] ?? 'D', 0, 1)) ?>
                     </div>
                 </div>
@@ -124,9 +133,10 @@ $page = $_GET['page'] ?? 'dashboard';
 
     <!-- Mobile Sidebar Overlay -->
     <div id="overlay" class="fixed inset-0 bg-secondary-900/50 backdrop-blur-sm hidden z-40 transition-opacity"></div>
-    
+
     <!-- Mobile Sidebar -->
-    <aside id="sidebar" class="fixed top-0 left-0 w-72 h-full bg-secondary-900 text-white transform -translate-x-full transition-transform duration-300 ease-in-out z-50">
+    <aside id="sidebar"
+        class="fixed top-0 left-0 w-72 h-full bg-secondary-900 text-white transform -translate-x-full transition-transform duration-300 ease-in-out z-50">
         <div class="p-8 flex flex-col h-full">
             <div class="flex justify-between items-center mb-10">
                 <div class="flex items-center space-x-3">
@@ -137,32 +147,39 @@ $page = $_GET['page'] ?? 'dashboard';
                 </div>
                 <button id="closeBtn" class="text-secondary-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
-            
+
             <nav class="space-y-2">
-                <a href="?page=dashboard" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page=='dashboard'?'sidebar-active':'text-secondary-400 hover:text-white' ?>">
+                <a href="?page=dashboard"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'dashboard' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-tachometer-alt w-6"></i><span>Dashboard Utama</span>
                 </a>
-                <a href="?page=kegiatan" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page=='kegiatan'?'sidebar-active':'text-secondary-400 hover:text-white' ?>">
+                <a href="?page=kegiatan"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-calendar-alt w-6"></i><span>Data Kegiatan</span>
                 </a>
-                <a href="?page=keuangan" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page=='keuangan'?'sidebar-active':'text-secondary-400 hover:text-white' ?>">
+                <a href="?page=keuangan"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'keuangan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-chart-line w-6"></i><span>Data Keuangan</span>
                 </a>
-                <a href="?page=pengaduan" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page=='pengaduan'?'sidebar-active':'text-secondary-400 hover:text-white' ?>">
+                <a href="?page=pengaduan"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'pengaduan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-comment-dots w-6"></i><span>Pengaduan Warga</span>
                 </a>
-                <a href="?page=registrasi" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page=='registrasi'?'sidebar-active':'text-secondary-400 hover:text-white' ?>">
+                <a href="?page=registrasi"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'registrasi' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-user-plus w-6"></i><span>Registrasi Warga</span>
                 </a>
-                <a href="?page=laporan" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page=='laporan'?'sidebar-active':'text-secondary-400 hover:text-white' ?>">
+                <a href="?page=laporan"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'laporan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-file-alt w-6"></i><span>Laporan Akuntansi</span>
                 </a>
             </nav>
 
             <div class="mt-auto pt-8">
-                <button onclick="confirmLogout()" class="flex items-center space-x-3 px-4 py-3 w-full rounded-xl bg-red-500/10 text-red-500">
+                <button onclick="confirmLogout()"
+                    class="flex items-center space-x-3 px-4 py-3 w-full rounded-xl bg-red-500/10 text-red-500">
                     <i class="fas fa-sign-out-alt w-6"></i>
-                    <span class="font-medium">Keluar Sistem</span>
+                    <span class="font-medium">Keluar</span>
                 </button>
             </div>
         </div>
@@ -172,57 +189,57 @@ $page = $_GET['page'] ?? 'dashboard';
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-    function confirmLogout() {
-        Swal.fire({
-            title: 'Keluar Sistem?',
-            text: "Apakah Anda yakin ingin mengakhiri sesi admin saat ini?",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#10b981',
-            cancelButtonColor: '#ef4444',
-            confirmButtonText: 'Ya, Keluar',
-            cancelButtonText: 'Batal',
-            background: '#ffffff',
-            customClass: {
-                popup: 'rounded-3xl shadow-xl border-0',
-                confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
-                cancelButton: 'rounded-xl px-6 py-2.5 font-bold'
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = "logout.php"; 
-            }
-        })
-    }
+        function confirmLogout() {
+            Swal.fire({
+                title: 'Keluar Sistem?',
+                text: "Apakah Anda yakin ingin mengakhiri sesi admin saat ini?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#ef4444',
+                confirmButtonText: 'Ya, Keluar',
+                cancelButtonText: 'Batal',
+                background: '#ffffff',
+                customClass: {
+                    popup: 'rounded-3xl shadow-xl border-0',
+                    confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
+                    cancelButton: 'rounded-xl px-6 py-2.5 font-bold'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "logout.php";
+                }
+            })
+        }
 
-    // Sidebar Mobile Interaction
-    const menuBtn = document.getElementById("menuBtn");
-    const closeBtn = document.getElementById("closeBtn");
-    const sidebar = document.getElementById("sidebar");
-    const overlay = document.getElementById("overlay");
+        // Sidebar Mobile Interaction
+        const menuBtn = document.getElementById("menuBtn");
+        const closeBtn = document.getElementById("closeBtn");
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("overlay");
 
-    if (menuBtn) {
-        menuBtn.addEventListener("click", () => {
-            sidebar.classList.remove("-translate-x-full");
-            overlay.classList.remove("hidden");
-            setTimeout(() => overlay.classList.add("opacity-100"), 10);
-        });
-    }
+        if (menuBtn) {
+            menuBtn.addEventListener("click", () => {
+                sidebar.classList.remove("-translate-x-full");
+                overlay.classList.remove("hidden");
+                setTimeout(() => overlay.classList.add("opacity-100"), 10);
+            });
+        }
 
-    if (closeBtn) {
-        closeBtn.addEventListener("click", closeModal);
-    }
+        if (closeBtn) {
+            closeBtn.addEventListener("click", closeModal);
+        }
 
-    if (overlay) {
-        overlay.addEventListener("click", closeModal);
-    }
+        if (overlay) {
+            overlay.addEventListener("click", closeModal);
+        }
 
-    function closeModal() {
-        sidebar.classList.add("-translate-x-full");
-        overlay.classList.add("hidden");
-    }
+        function closeModal() {
+            sidebar.classList.add("-translate-x-full");
+            overlay.classList.add("hidden");
+        }
 
-    // Active link highlight is already handled by PHP
+        // Active link highlight is already handled by PHP
     </script>
 
-<?php include 'includes/footer.php'; ?>
+    <?php include 'includes/footer.php'; ?>
