@@ -60,7 +60,7 @@ $page = $_GET['page'] ?? 'dashboard';
 
             <div class="mt-auto p-8">
                 <button onclick="confirmExit()"
-                    class="flex items-center space-x-3 px-4 py-3 w-full rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                    class="flex items-center justify-center space-x-3 px-4 py-3 w-full rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
                     <i class="fas fa-sign-out-alt w-6"></i>
                     <span class="font-medium">Keluar</span>
                 </button>
@@ -165,7 +165,7 @@ $page = $_GET['page'] ?? 'dashboard';
 
             <div class="mt-auto pt-8">
                 <button onclick="confirmExit()"
-                    class="flex items-center space-x-3 px-4 py-3 w-full rounded-xl bg-red-500/10 text-red-500">
+                    class="flex items-center justify-center space-x-3 px-4 py-3 w-full rounded-xl bg-red-500/10 text-red-500">
                     <i class="fas fa-sign-out-alt w-6"></i>
                     <span class="font-medium">Keluar</span>
                 </button>
@@ -203,7 +203,7 @@ $page = $_GET['page'] ?? 'dashboard';
                 text: "Apakah Anda yakin ingin mengakhiri sesi portal warga?",
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#10b981',
+                confirmButtonColor: '#059669',
                 cancelButtonColor: '#ef4444',
                 confirmButtonText: 'Ya, Keluar',
                 cancelButtonText: 'Batal',

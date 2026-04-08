@@ -48,7 +48,7 @@ $queryKegiatan = $conn->query("SELECT *,
     <div
         class="bg-white p-6 rounded-3xl shadow-sm border border-secondary-100 card-modern overflow-hidden relative group">
         <div
-            class="absolute -right-4 -top-4 w-24 h-24 bg-green-500/5 rounded-full group-hover:scale-150 transition-all duration-500">
+            class="absolute -right-4 -top-4 w-24 h-24 bg-green-500/10 rounded-full group-hover:scale-150 transition-all duration-500">
         </div>
         <div class="flex flex-col">
             <div
@@ -68,7 +68,7 @@ $queryKegiatan = $conn->query("SELECT *,
     <div
         class="bg-white p-6 rounded-3xl shadow-sm border border-secondary-100 card-modern overflow-hidden relative group">
         <div
-            class="absolute -right-4 -top-4 w-24 h-24 bg-red-500/5 rounded-full group-hover:scale-150 transition-all duration-500">
+            class="absolute -right-4 -top-4 w-24 h-24 bg-red-500/10 rounded-full group-hover:scale-150 transition-all duration-500">
         </div>
         <div class="flex flex-col">
             <div
@@ -88,7 +88,7 @@ $queryKegiatan = $conn->query("SELECT *,
     <div
         class="bg-white p-6 rounded-3xl shadow-sm border border-secondary-100 card-modern overflow-hidden relative group">
         <div
-            class="absolute -right-4 -top-4 w-24 h-24 bg-primary-500/5 rounded-full group-hover:scale-150 transition-all duration-500">
+            class="absolute -right-4 -top-4 w-24 h-24 bg-primary-500/10 rounded-full group-hover:scale-150 transition-all duration-500">
         </div>
         <div class="flex flex-col">
             <div
@@ -99,7 +99,7 @@ $queryKegiatan = $conn->query("SELECT *,
             <span class="text-2xl font-black text-secondary-900 mt-1">Rp
                 <?= number_format($saldoKasPenuh, 0, ',', '.') ?></span>
             <div class="mt-4 flex items-center text-xs font-bold text-primary-600">
-                <i class="fas fa-shield-alt mr-1"></i> Likuiditas Saat Ini
+                <i class="fas fa-shield-alt mr-1"></i> Saldo Saat Ini
             </div>
         </div>
     </div>
@@ -108,7 +108,7 @@ $queryKegiatan = $conn->query("SELECT *,
     <div
         class="bg-white p-6 rounded-3xl shadow-sm border border-secondary-100 card-modern overflow-hidden relative group">
         <div
-            class="absolute -right-4 -top-4 w-24 h-24 bg-yellow-500/5 rounded-full group-hover:scale-150 transition-all duration-500">
+            class="absolute -right-4 -top-4 w-24 h-24 bg-yellow-500/10 rounded-full group-hover:scale-150 transition-all duration-500">
         </div>
         <div class="flex flex-col">
             <div
@@ -133,7 +133,7 @@ $queryKegiatan = $conn->query("SELECT *,
                     <span class="w-2 h-8 bg-primary-500 rounded-full mr-3"></span>
                     Aktivitas Terbaru
                 </h3>
-                <a href="?page=keuangan" class="text-sm font-bold text-primary-600 hover:underline">Lihat Semua</a>
+                <a href="?page=keuangan" class="text-sm font-bold text-black-600 hover:underline">Lihat Semua</a>
             </div>
 
             <div

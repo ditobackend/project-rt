@@ -46,22 +46,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 extend: {
                     fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'], },
                     colors: {
-                        primary: { 50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac', 400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d', 800: '#166534', 900: '#14532d', 950: '#052e16', },
-                        secondary: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a', 950: '#020617', }
+                        primary: { 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22', },
+                        secondary: { 50: '#fafafa', 100: '#f4f4f5', 200: '#e4e4e7', 300: '#d4d4d8', 400: '#a1a1aa', 500: '#71717a', 600: '#52525b', 700: '#3f3f46', 800: '#27272a', 900: '#18181b', 950: '#09090b', }
                     }
                 }
             }
         }
     </script>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image: radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+                              radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+        }
+        .glass { 
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .input-premium:focus-within {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(5, 150, 105, 0.1);
+        }
     </style>
 </head>
 <body class="bg-secondary-50 min-h-screen flex items-center justify-center p-6 relative">
     <!-- Decorative Elements -->
     <div class="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-primary-100 rounded-full blur-3xl opacity-50"></div>
-    <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
+    <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-secondary-200 rounded-full blur-3xl opacity-50"></div>
 
     <div class="w-full max-w-md relative z-10">
         <!-- Logo/Header -->
@@ -92,18 +105,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
                 </div>
 
-                <div>
+                <div class="input-premium transition-all">
                     <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] mb-2 ml-1">Kata Sandi</label>
-                    <div class="relative">
-                        <i class="fas fa-lock absolute left-5 top-1/2 -translate-y-1/2 text-secondary-300"></i>
-                        <input type="password" name="password" placeholder="••••••••" required
-                               class="w-full pl-12 pr-6 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-600 rounded-2xl text-secondary-900 font-medium placeholder-secondary-300 transition-all">
+                    <div class="relative group">
+                        <i class="fas fa-lock absolute left-5 top-1/2 -translate-y-1/2 text-secondary-300 group-focus-within:text-primary-500 transition-colors"></i>
+                        <input type="password" name="password" id="passwordInput" placeholder="••••••••" required
+                               class="w-full pl-12 pr-12 py-4 bg-secondary-50/50 border border-transparent focus:border-primary-500/20 focus:ring-4 focus:ring-primary-500/5 rounded-2xl text-secondary-900 font-medium placeholder-secondary-300 transition-all outline-none">
+                        <button type="button" onclick="togglePassword()" class="absolute right-5 top-1/2 -translate-y-1/2 text-secondary-300 hover:text-primary-500 transition-colors focus:outline-none">
+                            <i id="eyeIcon" class="fas fa-eye"></i>
+                        </button>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full py-5 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 transition-all shadow-xl shadow-primary-500/20 uppercase tracking-widest text-sm active:scale-95 flex items-center justify-center gap-3">
+                <button type="submit" class="w-full py-5 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 hover:shadow-2xl hover:shadow-primary-600/30 transition-all uppercase tracking-widest text-sm active:scale-[0.98] flex items-center justify-center gap-3">
                     Masuk Sekarang
-                    <i class="fas fa-sign-in-alt text-xs"></i>
+                    <i class="fas fa-arrow-right text-xs"></i>
                 </button>
             </form>
 
@@ -119,5 +135,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </a>
         </div>
     </div>
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </body>
 </html>

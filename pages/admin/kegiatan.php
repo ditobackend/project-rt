@@ -127,7 +127,7 @@ $result = $stmt->get_result();
 
     <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin'): ?>
         <button id="btnTambah"
-            class="inline-flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-primary-500/20 transition-all active:scale-95 text-sm uppercase tracking-widest">
+            class="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-primary-500/20 transition-all active:scale-95 text-sm uppercase tracking-widest">
             <i class="fas fa-plus"></i> Kegiatan Baru
         </button>
     <?php endif; ?>
