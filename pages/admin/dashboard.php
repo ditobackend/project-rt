@@ -23,6 +23,18 @@ $pengeluaranBulanIni = $sqlPengeluaranBulanIni->fetch_assoc()['total'] ?? 0;
 
 // Riwayat Aktivitas Terbaru
 $queryAktivitas = $conn->query("SELECT * FROM keuangan ORDER BY tanggal DESC, id DESC LIMIT 5");
+
+// Data Kegiatan Terbaru/Mendatang (Otomatis Hilang Jika Sudah Selesai)
+$queryKegiatan = $conn->query("SELECT *, 
+    CASE 
+        WHEN NOW() >= CONCAT(tanggal, ' ', jam_mulai) AND NOW() <= CONCAT(tanggal, ' ', jam_selesai) THEN 'live'
+        WHEN NOW() < CONCAT(tanggal, ' ', jam_mulai) THEN 'upcoming'
+        ELSE 'finished'
+    END as status_realtime
+    FROM kegiatan 
+    WHERE CONCAT(tanggal, ' ', jam_selesai) >= NOW() 
+    ORDER BY tanggal ASC, jam_mulai ASC 
+    LIMIT 3");
 ?>
 
 <div class="mb-10">
@@ -175,48 +187,59 @@ $queryAktivitas = $conn->query("SELECT * FROM keuangan ORDER BY tanggal DESC, id
         </div>
     </div>
 
-    <!-- Right Column: Monthly Summary -->
+    <!-- Right Column: Activity Information -->
     <div class="space-y-8">
-        <div class="bg-secondary-900 p-8 rounded-[2rem] shadow-xl text-white relative overflow-hidden">
+        <div class="bg-secondary-900 p-8 rounded-[2rem] shadow-xl text-white relative overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary-500/10 group/card">
             <div class="absolute top-0 right-0 w-32 h-32 bg-primary-500/20 blur-3xl rounded-full"></div>
 
             <h3 class="text-xl font-bold mb-6 flex items-center">
-                <i class="fas fa-calendar-alt mr-3 text-primary-400"></i>
-                Ringkasan Bulanan
+                <i class="fas fa-calendar-star mr-3 text-primary-400"></i>
+                Informasi Kegiatan
             </h3>
 
-            <div class="space-y-6 relative z-10">
-                <div class="p-5 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/5">
-                    <p class="text-secondary-400 text-xs font-bold uppercase tracking-widest mb-1">Pemasukan Bulan Ini
-                    </p>
-                    <p class="text-2xl font-black text-green-400">Rp
-                        <?= number_format($pemasukanBulanIni, 0, ',', '.') ?></p>
-                </div>
-
-                <div class="p-5 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/5">
-                    <p class="text-secondary-400 text-xs font-bold uppercase tracking-widest mb-1">Pengeluaran Bulan Ini
-                    </p>
-                    <p class="text-2xl font-black text-red-400">Rp
-                        <?= number_format($pengeluaranBulanIni, 0, ',', '.') ?></p>
-                </div>
-
-                <div class="pt-4 border-t border-white/10">
-                    <div class="flex items-center justify-between">
-                        <span class="text-secondary-400 font-medium">Total Kas</span>
-                        <span class="text-primary-400 font-black">Rp
-                            <?= number_format($saldoKasPenuh, 0, ',', '.') ?></span>
+            <div class="space-y-4 relative z-10">
+                <?php if ($queryKegiatan->num_rows > 0): ?>
+                    <?php while ($kgt = $queryKegiatan->fetch_assoc()): 
+                        $isLive = ($kgt['status_realtime'] === 'live');
+                        ?>
+                        <div class="p-4 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/5 hover:bg-white/10 hover:border-primary-500/50 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary-500/10 transition-all duration-300 group cursor-default">
+                            <div class="flex justify-between items-start">
+                                <div class="flex flex-col">
+                                    <?php if ($isLive): ?>
+                                        <span class="flex items-center text-[9px] font-black text-emerald-400 uppercase tracking-[0.2em] mb-1">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
+                                            Sedang Berlangsung
+                                        </span>
+                                    <?php endif; ?>
+                                    <p class="text-white font-bold group-hover:text-primary-400 transition-colors uppercase text-sm tracking-wide">
+                                        <?= htmlspecialchars($kgt['judul']) ?>
+                                    </p>
+                                </div>
+                                <i class="fas fa-arrow-right text-xs text-primary-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+                            </div>
+                            <div class="flex items-center mt-2 text-xs text-secondary-400 font-medium">
+                                <i class="far fa-calendar-alt mr-2 text-primary-500"></i>
+                                <?= date('d M Y', strtotime($kgt['tanggal'])) ?>
+                                <span class="mx-2 text-secondary-600">•</span>
+                                <i class="far fa-clock mr-2 text-primary-500"></i>
+                                <?= date('H:i', strtotime($kgt['jam_mulai'])) ?>
+                            </div>
+                        </div>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <div class="text-center py-6">
+                        <i class="fas fa-calendar-times text-3xl text-secondary-700 mb-3 block"></i>
+                        <p class="text-secondary-500 text-sm font-medium">Belum ada kegiatan mendatang.</p>
                     </div>
-                </div>
+                <?php endif; ?>
             </div>
 
             <div class="mt-8">
-                <a href="?page=laporan"
-                    class="block w-full bg-white text-secondary-900 text-center py-4 rounded-2xl font-black text-sm hover:bg-primary-500 hover:text-white transition-all">
-                    Unduh Laporan Bulanan
+                <a href="?page=kegiatan"
+                    class="block w-full bg-white text-secondary-900 text-center py-4 rounded-2xl font-black text-sm hover:bg-primary-500 hover:text-white transition-all shadow-lg hover:shadow-primary-500/25">
+                    Lihat Semua Kegiatan
                 </a>
             </div>
         </div>
-
-
     </div>
 </div>

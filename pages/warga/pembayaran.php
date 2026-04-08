@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $params = [
                     'transaction_details' => [
                         'order_id' => 'ORDER-' . uniqid(),
-                        'gross_amount' => (int)$jumlah,
+                        'gross_amount' => (int) $jumlah,
                     ],
                     'customer_details' => [
                         'first_name' => $nama,
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     'item_details' => [
                         [
                             'id' => strtolower(str_replace(' ', '-', $kategori)),
-                            'price' => (int)$jumlah,
+                            'price' => (int) $jumlah,
                             'quantity' => 1,
                             'name' => $kategori,
                         ],
@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <div class="mb-10">
     <h2 class="text-3xl font-extrabold text-secondary-900 tracking-tight">Pembayaran Iuran</h2>
-    <p class="text-secondary-500 mt-1">Lakukan pembayaran iuran bulanan atau donasi secara digital maupun manual.</p>
+    <p class="text-secondary-500 mt-1">Lakukan pembayaran iuran bulanan, iuran keamanan, atau donasi</p>
 </div>
 
 <div class="grid lg:grid-cols-3 gap-8 items-start">
@@ -115,21 +115,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
 
             <?php if ($success): ?>
-                <div class="p-4 mb-6 bg-green-50 text-green-700 rounded-2xl border border-green-100 flex items-center gap-3 animate-in fade-in transition-all">
+                <div
+                    class="p-4 mb-6 bg-green-50 text-green-700 rounded-2xl border border-green-100 flex items-center gap-3 animate-in fade-in transition-all">
                     <i class="fas fa-check-circle"></i>
                     <p class="text-xs font-bold uppercase tracking-tight"><?= $success ?></p>
                 </div>
             <?php endif; ?>
 
             <?php if ($error): ?>
-                <div class="p-4 mb-6 bg-red-50 text-red-700 rounded-2xl border border-red-100 flex items-center gap-3 animate-in fade-in transition-all">
+                <div
+                    class="p-4 mb-6 bg-red-50 text-red-700 rounded-2xl border border-red-100 flex items-center gap-3 animate-in fade-in transition-all">
                     <i class="fas fa-exclamation-circle text-lg"></i>
                     <div class="flex-1">
                         <p class="text-xs font-bold uppercase tracking-tight"><?= $error ?></p>
-                        <?php if(isset($show_cancel_btn)): ?>
+                        <?php if (isset($show_cancel_btn)): ?>
                             <form method="POST" class="mt-2">
                                 <input type="hidden" name="cancel_pending" value="1">
-                                <button type="submit" class="text-[10px] font-black uppercase text-red-600 hover:underline">Batalkan & Buat Baru</button>
+                                <button type="submit"
+                                    class="text-[10px] font-black uppercase text-red-600 hover:underline">Batalkan & Buat
+                                    Baru</button>
                             </form>
                         <?php endif; ?>
                     </div>
@@ -139,13 +143,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <form method="POST" class="space-y-6">
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Nama Pembayar</label>
-                        <input type="text" name="nama" value="<?= $_SESSION['user_nama'] ?? '' ?>" placeholder="Nama Lengkap" required
-                               class="w-full px-5 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium transition-all">
+                        <label
+                            class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Nama
+                            Pembayar</label>
+                        <input type="text" name="nama" value="<?= $_SESSION['user_nama'] ?? '' ?>"
+                            placeholder="Nama Lengkap" required
+                            class="w-full px-5 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium transition-all">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Kategori Iuran</label>
-                        <select name="kategori" required class="w-full px-5 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium transition-all appearance-none cursor-pointer">
+                        <label
+                            class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Kategori
+                            Iuran</label>
+                        <select name="kategori" required
+                            class="w-full px-5 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium transition-all appearance-none cursor-pointer">
                             <option value="">Pilih Kategori</option>
                             <option value="Iuran Bulanan">Iuran Bulanan</option>
                             <option value="Iuran Keamanan">Iuran Keamanan</option>
@@ -156,15 +166,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Jumlah Pembayaran</label>
+                        <label
+                            class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Jumlah
+                            Pembayaran</label>
                         <div class="relative">
                             <input type="text" id="jumlah" name="jumlah" placeholder="Rp 0" required
-                                   class="w-full px-5 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-black transition-all">
+                                class="w-full px-5 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-black transition-all">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Metode Otomatis</label>
-                        <div class="w-full px-5 py-4 bg-secondary-100 text-secondary-400 border-0 rounded-2xl font-bold flex items-center gap-3">
+                        <label
+                            class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Metode
+                            Otomatis</label>
+                        <div
+                            class="w-full px-5 py-4 bg-secondary-100 text-secondary-400 border-0 rounded-2xl font-bold flex items-center gap-3">
                             <i class="fas fa-bolt text-primary-500"></i>
                             E-Wallet, VA, QRIS (Midtrans)
                         </div>
@@ -172,71 +187,77 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Catatan Tambahan (Opsional)</label>
-                    <textarea name="catatan" placeholder="Tambahkan keterangan jika perlu..." 
-                              class="w-full px-5 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium transition-all resize-none h-24"></textarea>
+                    <label
+                        class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Catatan
+                        Tambahan (Opsional)</label>
+                    <textarea name="catatan" placeholder="Tambahkan keterangan jika perlu..."
+                        class="w-full px-5 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium transition-all resize-none h-24"></textarea>
                 </div>
 
                 <div class="pt-4">
-                    <button type="submit" class="w-full py-5 bg-primary-600 hover:bg-primary-700 text-white font-black rounded-2xl shadow-xl shadow-primary-500/20 transition-all uppercase tracking-widest text-sm flex items-center justify-center gap-3 active:scale-95">
+                    <button type="submit"
+                        class="w-full py-5 bg-primary-600 hover:bg-primary-700 text-white font-black rounded-2xl shadow-xl shadow-primary-500/20 transition-all uppercase tracking-widest text-sm flex items-center justify-center gap-3 active:scale-95">
                         <i class="fas fa-shield-alt"></i>
                         Proses Pembayaran Aman
                     </button>
-                    <p class="text-center text-[10px] text-secondary-400 mt-4 uppercase tracking-widest font-bold">Enkripsi 256-bit Secure Socket Layer</p>
+                    <p class="text-center text-[10px] text-secondary-400 mt-4 uppercase tracking-widest font-bold">
+                        Enkripsi 256-bit Secure Socket Layer</p>
                 </div>
             </form>
 
             <?php if (!empty($snapToken)): ?>
-            <div class="mt-6">
-                <button id="pay-button" class="w-full py-4 bg-green-600 text-white font-black rounded-2xl shadow-lg shadow-green-500/20 hover:bg-green-700 transition-all uppercase tracking-widest text-xs animate-pulse">
-                    Buka Jendela Pembayaran
-                </button>
-            </div>
-            <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="<?php echo \Midtrans\Config::$clientKey; ?>"></script>
-            <script type="text/javascript">
-                (function () {
-                    const snapToken = '<?= $snapToken ?>';
-                    const currentOrderId = '<?= $order_id ?? "" ?>';
+                <div class="mt-6">
+                    <button id="pay-button"
+                        class="w-full py-4 bg-green-600 text-white font-black rounded-2xl shadow-lg shadow-green-500/20 hover:bg-green-700 transition-all uppercase tracking-widest text-xs animate-pulse">
+                        Buka Jendela Pembayaran
+                    </button>
+                </div>
+                <script src="https://app.sandbox.midtrans.com/snap/snap.js"
+                    data-client-key="<?php echo \Midtrans\Config::$clientKey; ?>"></script>
+                <script type="text/javascript">
+                    (function () {
+                        const snapToken = '<?= $snapToken ?>';
+                        const currentOrderId = '<?= $order_id ?? "" ?>';
 
-                    function updatePaymentStatus(orderId, status, callback) {
-                        fetch('<?= (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] ?>/update_payment_status.php', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                            body: 'order_id=' + encodeURIComponent(orderId) + '&status=' + encodeURIComponent(status)
-                        })
-                        .then(res => res.json())
-                        .then(data => { if (callback) callback(data); })
-                        .catch(err => { console.error('Update status error:', err); if (callback) callback(null); });
-                    }
+                        function updatePaymentStatus(orderId, status, callback) {
+                            fetch('<?= (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] ?>/update_payment_status.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                body: 'order_id=' + encodeURIComponent(orderId) + '&status=' + encodeURIComponent(status)
+                            })
+                                .then(res => res.json())
+                                .then(data => { if (callback) callback(data); })
+                                .catch(err => { console.error('Update status error:', err); if (callback) callback(null); });
+                        }
 
-                    function triggerSnapPay(token) {
-                        if (!token) return;
-                        snap.pay(token, {
-                            onSuccess: function(result){
-                                updatePaymentStatus(currentOrderId, 'berhasil', function() {
-                                    Swal.fire('Berhasil!', 'Pembayaran telah diterima.', 'success').then(() => {
-                                        window.location.href = 'dashboard_warga.php?page=pembayaran';
+                        function triggerSnapPay(token) {
+                            if (!token) return;
+                            snap.pay(token, {
+                                onSuccess: function (result) {
+                                    updatePaymentStatus(currentOrderId, 'berhasil', function () {
+                                        Swal.fire('Berhasil!', 'Pembayaran telah diterima.', 'success').then(() => {
+                                            window.location.href = 'dashboard_warga.php?page=pembayaran';
+                                        });
                                     });
-                                });
-                            },
-                            onPending: function(result){
-                                Swal.fire('Menunggu!', 'Lengkapi pembayaran Anda.', 'info');
-                            },
-                            onError: function(result){
-                                updatePaymentStatus(currentOrderId, 'gagal', function() {
-                                    Swal.fire('Gagal!', 'Terjadi kesalahan sistem.', 'error');
-                                });
-                            },
-                            onClose: function(){
-                                console.log('Snap closed');
-                            }
-                        });
-                    }
+                                },
+                                onPending: function (result) {
+                                    Swal.fire('Menunggu!', 'Lengkapi pembayaran Anda.', 'info');
+                                },
+                                onError: function (result) {
+                                    updatePaymentStatus(currentOrderId, 'gagal', function () {
+                                        Swal.fire('Gagal!', 'Terjadi kesalahan sistem.', 'error');
+                                    });
+                                },
+                                onClose: function () {
+                                    console.log('Snap closed');
+                                }
+                            });
+                        }
 
-                    document.getElementById('pay-button').addEventListener('click', () => triggerSnapPay(snapToken));
-                    <?php if ($autoOpenSnap): ?> triggerSnapPay(snapToken); <?php endif; ?>
-                })();
-            </script>
+                        document.getElementById('pay-button').addEventListener('click', () => triggerSnapPay(snapToken));
+                        <?php if ($autoOpenSnap): ?> triggerSnapPay(snapToken); <?php endif; ?>
+                    })();
+                </script>
             <?php endif; ?>
         </div>
     </div>
@@ -259,7 +280,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <span class="font-black text-secondary-900">Rp 25.000</span>
                 </div>
                 <div class="p-4 border-2 border-dashed border-secondary-100 rounded-2xl text-center">
-                    <p class="text-[10px] font-black text-secondary-300 uppercase tracking-widest mb-1">Donasi Kegiatan</p>
+                    <p class="text-[10px] font-black text-secondary-300 uppercase tracking-widest mb-1">Donasi Kegiatan
+                    </p>
                     <p class="text-sm font-bold text-secondary-500 italic">Nilai Sukarela</p>
                 </div>
             </div>
@@ -273,7 +295,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 Transfer Manual
             </h3>
             <div class="space-y-4">
-                <div class="p-5 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer group">
+                <div
+                    class="p-5 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer group">
                     <div class="flex justify-between items-center mb-1">
                         <span class="text-[10px] font-black uppercase tracking-widest text-primary-400">Bank BCA</span>
                         <i class="far fa-copy text-sm opacity-0 group-hover:opacity-100 transition-opacity"></i>
@@ -281,9 +304,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <p class="text-xl font-bold tracking-wider mb-1">123 456 7890</p>
                     <p class="text-xs text-secondary-400 font-medium">a.n. Kas RT 06/08</p>
                 </div>
-                <div class="p-5 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer group">
+                <div
+                    class="p-5 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer group">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="text-[10px] font-black uppercase tracking-widest text-primary-400">Bank Mandiri</span>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-primary-400">Bank
+                            Mandiri</span>
                         <i class="far fa-copy text-sm opacity-0 group-hover:opacity-100 transition-opacity"></i>
                     </div>
                     <p class="text-xl font-bold tracking-wider mb-1">098 765 4321</p>
@@ -298,14 +323,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </div>
 
 <script>
-const jumlahInput = document.getElementById("jumlah");
-jumlahInput.addEventListener("input", function() {
-    let value = this.value.replace(/[^0-9]/g, "");
-    let number = parseInt(value);
-    if (!isNaN(number) && number > 0) {
-        this.value = "Rp " + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    } else {
-        this.value = "";
-    }
-});
+    const jumlahInput = document.getElementById("jumlah");
+    jumlahInput.addEventListener("input", function () {
+        let value = this.value.replace(/[^0-9]/g, "");
+        let number = parseInt(value);
+        if (!isNaN(number) && number > 0) {
+            this.value = "Rp " + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        } else {
+            this.value = "";
+        }
+    });
 </script>

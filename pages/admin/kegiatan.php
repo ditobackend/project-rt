@@ -55,27 +55,54 @@ $where = [];
 $params = [];
 $types = "";
 
-// filter cari
-if (!empty($_GET['cari'])) {
+$statusFilter = $_GET['status'] ?? "";
+$bulanTahunFilter = $_GET['bulan_tahun'] ?? "";
+$cariFilter = $_GET['cari'] ?? "";
+
+// Ambil daftar bulan-tahun yang tersedia di database (termasuk yang sudah lewat)
+$periodsQuery = $conn->query("SELECT DATE_FORMAT(tanggal, '%m-%Y') as period FROM kegiatan GROUP BY period ORDER BY MIN(tanggal) DESC");
+$availablePeriods = [];
+$bulanIndo = [1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'];
+while($p = $periodsQuery->fetch_assoc()) {
+    $parts = explode('-', $p['period']);
+    $m = (int)$parts[0];
+    $y = $parts[1];
+    $availablePeriods[] = [
+        'value' => $p['period'],
+        'label' => $bulanIndo[$m] . " " . $y
+    ];
+}
+
+// Logic Filter
+if (!empty($cariFilter)) {
     $where[] = "(judul LIKE ? OR deskripsi LIKE ? OR penyelenggara LIKE ?)";
-    $keyword = "%" . $_GET['cari'] . "%";
+    $keyword = "%" . $cariFilter . "%";
     $params[] = $keyword;
     $params[] = $keyword;
     $params[] = $keyword;
     $types .= "sss";
 }
 
-// filter status
-if (!empty($_GET['status'])) {
-    if ($_GET['status'] == 'akan_datang') {
-        $where[] = "NOW() < CONCAT(tanggal, ' ', jam_mulai)";
-    } elseif ($_GET['status'] == 'berlangsung') {
-        $where[] = "NOW() >= CONCAT(tanggal, ' ', jam_mulai) AND NOW() <= CONCAT(tanggal, ' ', jam_selesai)";
+if (empty($statusFilter) && empty($bulanTahunFilter)) {
+    // Default: Tampilkan yang aktif/mendatang
+    $where[] = "CONCAT(tanggal, ' ', jam_selesai) >= NOW()";
+} else {
+    if (!empty($statusFilter)) {
+        if ($statusFilter == 'akan_datang') {
+            $where[] = "NOW() < CONCAT(tanggal, ' ', jam_mulai)";
+        } elseif ($statusFilter == 'berlangsung') {
+            $where[] = "NOW() >= CONCAT(tanggal, ' ', jam_mulai) AND NOW() <= CONCAT(tanggal, ' ', jam_selesai)";
+        } elseif ($statusFilter == 'selesai') {
+            $where[] = "CONCAT(tanggal, ' ', jam_selesai) < NOW()";
+        }
     }
 }
 
-// Sembunyikan otomatis jika sesi jam sudah melewati waktu real-time
-$where[] = "CONCAT(tanggal, ' ', jam_selesai) >= NOW()";
+if (!empty($bulanTahunFilter)) {
+    $where[] = "DATE_FORMAT(tanggal, '%m-%Y') = ?";
+    $params[] = $bulanTahunFilter;
+    $types .= "s";
+}
 
 $sql = "SELECT * FROM kegiatan";
 if ($where) {
@@ -84,7 +111,6 @@ if ($where) {
 $sql .= " ORDER BY tanggal DESC, jam_mulai ASC";
 
 $stmt = $conn->prepare($sql);
-
 if ($params) {
     $stmt->bind_param($types, ...$params);
 }
@@ -108,36 +134,75 @@ $result = $stmt->get_result();
 </div>
 
 <!-- Advanced Search & Filter -->
-<div class="bg-white p-6 rounded-[2rem] shadow-sm border border-secondary-100 mb-8">
-    <form method="GET" action="dashboard_admin.php" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+<div class="bg-white p-7 rounded-[2.5rem] shadow-sm border border-secondary-100 mb-8 overflow-hidden relative">
+    <div class="absolute top-0 right-0 w-32 h-32 bg-primary-500/5 blur-3xl rounded-full"></div>
+    
+    <form id="filterForm" method="GET" action="dashboard_admin.php" class="space-y-6 relative z-10">
         <input type="hidden" name="page" value="kegiatan">
+        <input type="hidden" name="status" id="statusInput" value="<?= htmlspecialchars($statusFilter) ?>">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-end">
+            <!-- Search -->
+            <div class="lg:col-span-2">
+                <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-3 ml-1 flex items-center">
+                    <i class="fas fa-search mr-2 text-primary-500"></i>
+                    Cari Kegiatan
+                </label>
+                <div class="relative group">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-secondary-300 group-focus-within:text-primary-500 transition-colors"></i>
+                    <input type="text" name="cari" placeholder="Cari judul, deskripsi, atau penyelenggara..." 
+                        value="<?= htmlspecialchars($cariFilter) ?>"
+                        class="w-full pl-11 pr-4 py-3.5 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium placeholder-secondary-300 transition-all hover:bg-white">
+                </div>
+            </div>
 
-        <div class="md:col-span-2">
-            <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Cari Kata
-                Kunci</label>
-            <div class="relative">
-                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-secondary-300"></i>
-                <input type="text" name="cari" placeholder="Cari judul atau deskripsi..."
-                    value="<?= isset($_GET['cari']) ? htmlspecialchars($_GET['cari']) : '' ?>"
-                    class="w-full pl-12 pr-4 py-3 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 placeholder-secondary-300 transition-all">
+            <!-- Period Selector -->
+            <div class="lg:col-span-2">
+                <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-3 ml-1 flex items-center">
+                    <i class="fas fa-calendar-alt mr-2 text-primary-500"></i>
+                    Pilih Periode
+                </label>
+                <div class="relative group">
+                    <i class="far fa-calendar absolute left-5 top-1/2 -translate-y-1/2 text-secondary-300 group-focus-within:text-primary-500 transition-colors"></i>
+                    <select name="bulan_tahun" onchange="this.form.submit()" 
+                        class="w-full pl-12 pr-12 py-3.5 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-bold appearance-none cursor-pointer transition-all hover:bg-white hover:shadow-sm">
+                        <option value="">Semua Periode</option>
+                        <?php foreach ($availablePeriods as $period): ?>
+                            <option value="<?= $period['value'] ?>" <?= ($bulanTahunFilter == $period['value']) ? 'selected' : '' ?>>
+                                <?= $period['label'] ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-secondary-300 text-[10px] pointer-events-none group-hover:text-primary-500 transition-colors"></i>
+                </div>
             </div>
         </div>
 
-        <div>
-            <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Status
-                Saat Ini</label>
-            <select name="status"
-                class="w-full px-4 py-3 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 appearance-none font-medium transition-all">
-                <option value="">Semua Status</option>
-                <option value="akan_datang" <?= (isset($_GET['status']) && $_GET['status'] == 'akan_datang') ? 'selected' : '' ?>>Mendatang Saja</option>
-                <option value="berlangsung" <?= (isset($_GET['status']) && $_GET['status'] == 'berlangsung') ? 'selected' : '' ?>>Sedang Berlangsung</option>
-            </select>
+        <!-- Status Chips -->
+        <div class="w-full pt-2">
+            <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-4 ml-1 flex items-center">
+                <i class="fas fa-layer-group mr-2 text-primary-500"></i>
+                Status Kegiatan
+            </label>
+            <div class="flex flex-wrap gap-2">
+                <?php
+                $statuses = [
+                    '' => ['label' => 'Aktif', 'icon' => 'fa-bolt'],
+                    'akan_datang' => ['label' => 'Mendatang', 'icon' => 'fa-clock'],
+                    'berlangsung' => ['label' => 'Berlangsung', 'icon' => 'fa-play-circle'],
+                    'selesai' => ['label' => 'Selesai (Arsip)', 'icon' => 'fa-check-circle']
+                ];
+                foreach ($statuses as $val => $data):
+                    $active = ($statusFilter == $val);
+                ?>
+                <button type="button" onclick="setStatus('<?= $val ?>')" 
+                    class="group flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-black transition-all duration-300 <?= $active ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/30' : 'bg-secondary-50 text-secondary-500 hover:bg-white hover:shadow-md hover:text-primary-600' ?>">
+                    <i class="fas <?= $data['icon'] ?> text-sm <?= $active ? 'text-white' : 'text-secondary-300 group-hover:text-primary-500' ?>"></i>
+                    <?= $data['label'] ?>
+                </button>
+                <?php endforeach; ?>
+            </div>
         </div>
-
-        <button type="submit"
-            class="w-full px-6 py-3 bg-secondary-900 text-white font-black rounded-2xl hover:bg-secondary-800 transition-all active:scale-95">
-            TERAPKAN FILTER
-        </button>
     </form>
 </div>
 
@@ -206,13 +271,15 @@ $result = $stmt->get_result();
                                 $end_time = strtotime($row['tanggal'] . ' ' . $row['jam_selesai']);
 
                                 $isLive = ($now >= $start_time && $now <= $end_time);
-                                $color = $isLive ? "green" : "blue";
-                                $label = $isLive ? "Berlangsung" : "Terjadwal";
+                                $isFinished = ($now > $end_time);
+
+                                $color = $isLive ? "green" : ($isFinished ? "secondary" : "blue");
+                                $label = $isLive ? "Berlangsung" : ($isFinished ? "Selesai" : "Terjadwal");
                                 ?>
                                 <span
                                     class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-<?= $color ?>-100 text-<?= $color ?>-600 ring-4 ring-<?= $color ?>-50">
                                     <span
-                                        class="w-1.5 h-1.5 rounded-full bg-<?= $color ?>-600 mr-2 <?= $isLive ? 'animate-pulse' : '' ?>"></span>
+                                        class="w-1.5 h-1.5 rounded-full bg-<?= $color ?>-600 mr-2 <?= ($isLive && !$isFinished) ? 'animate-pulse' : '' ?>"></span>
                                     <?= $label ?>
                                 </span>
                             </td>
@@ -256,8 +323,8 @@ $result = $stmt->get_result();
 <div id="modalContainer"
     class="fixed inset-0 bg-secondary-900/60 backdrop-blur-sm hidden z-[100] transition-all flex items-center justify-center p-4">
     <div
-        class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-xl overflow-hidden animate-in fade-in zoom-in duration-300">
-        <div class="px-10 pt-10 pb-4 flex items-center justify-between">
+        class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-y-auto max-h-[90vh] animate-in fade-in zoom-in duration-300 custom-scrollbar">
+        <div class="px-8 pt-8 pb-4 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md z-10">
             <h3 id="modalTitle" class="text-2xl font-black text-secondary-900 tracking-tight">Tambah Kegiatan Baru</h3>
             <button id="modalClose"
                 class="w-10 h-10 rounded-full bg-secondary-50 text-secondary-400 hover:text-secondary-900 transition-all flex items-center justify-center">
@@ -265,7 +332,7 @@ $result = $stmt->get_result();
             </button>
         </div>
 
-        <form id="eventForm" method="POST" class="px-10 pb-10 space-y-5">
+        <form id="eventForm" method="POST" class="px-8 pb-8 space-y-5">
             <input type="hidden" name="id" id="editId">
             <input type="hidden" name="status" id="editStatus" value="akan_datang">
 
@@ -371,4 +438,9 @@ $result = $stmt->get_result();
     modal.addEventListener('click', (e) => {
         if (e.target === modal) modal.classList.add('hidden');
     });
+
+    function setStatus(val) {
+        document.getElementById('statusInput').value = val;
+        document.getElementById('filterForm').submit();
+    }
 </script>

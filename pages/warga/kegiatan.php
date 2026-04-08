@@ -7,30 +7,49 @@ $params = [];
 $types = "";
 
 $statusFilter = $_GET['status'] ?? "";
-$bulanFilter = $_GET['bulan'] ?? "";
+$bulanTahunFilter = $_GET['bulan_tahun'] ?? "";
 
-// Sembunyikan otomatis jika sesi jam sudah melewati waktu real-time
-$where[] = "CONCAT(tanggal, ' ', jam_selesai) >= NOW()";
+// Ambil daftar bulan-tahun yang tersedia di database (termasuk yang sudah lewat)
+$periodsQuery = $conn->query("SELECT DATE_FORMAT(tanggal, '%m-%Y') as period FROM kegiatan GROUP BY period ORDER BY MIN(tanggal) DESC");
+$availablePeriods = [];
+$bulanIndo = [1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'];
+while($p = $periodsQuery->fetch_assoc()) {
+    $parts = explode('-', $p['period']);
+    $m = (int)$parts[0];
+    $y = $parts[1];
+    $availablePeriods[] = [
+        'value' => $p['period'],
+        'label' => $bulanIndo[$m] . " " . $y
+    ];
+}
 
-if (!empty($statusFilter)) {
-    if ($statusFilter == 'akan_datang') {
-        $where[] = "NOW() < CONCAT(tanggal, ' ', jam_mulai)";
-    } elseif ($statusFilter == 'berlangsung') {
-        $where[] = "NOW() >= CONCAT(tanggal, ' ', jam_mulai) AND NOW() <= CONCAT(tanggal, ' ', jam_selesai)";
+// Logic Filter
+if (empty($statusFilter) && empty($bulanTahunFilter)) {
+    // Default: Hanya tampilkan yang akan datang & sedang berlangsung
+    $where[] = "CONCAT(tanggal, ' ', jam_selesai) >= NOW()";
+} else {
+    if (!empty($statusFilter)) {
+        if ($statusFilter == 'akan_datang') {
+            $where[] = "NOW() < CONCAT(tanggal, ' ', jam_mulai)";
+        } elseif ($statusFilter == 'berlangsung') {
+            $where[] = "NOW() >= CONCAT(tanggal, ' ', jam_mulai) AND NOW() <= CONCAT(tanggal, ' ', jam_selesai)";
+        } elseif ($statusFilter == 'selesai') {
+            $where[] = "CONCAT(tanggal, ' ', jam_selesai) < NOW()";
+        }
     }
 }
 
-if (!empty($bulanFilter)) {
-    $where[] = "MONTH(tanggal) = ?";
-    $params[] = $bulanFilter;
-    $types .= "i";
+if (!empty($bulanTahunFilter)) {
+    $where[] = "DATE_FORMAT(tanggal, '%m-%Y') = ?";
+    $params[] = $bulanTahunFilter;
+    $types .= "s";
 }
 
 $sql = "SELECT * FROM kegiatan";
 if ($where) {
     $sql .= " WHERE " . implode(" AND ", $where);
 }
-$sql .= " ORDER BY tanggal ASC, jam_mulai ASC";
+$sql .= " ORDER BY tanggal DESC, jam_mulai ASC";
 
 $stmt = $conn->prepare($sql);
 if ($params) {
@@ -48,37 +67,66 @@ $result = $stmt->get_result();
 </div>
 
 <!-- Filter Box -->
-<div class="bg-white p-6 rounded-[2rem] shadow-sm border border-secondary-100 mb-8">
-    <form method="GET" action="dashboard_warga.php" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+<div class="bg-white p-7 rounded-[2.5rem] shadow-sm border border-secondary-100 mb-8 overflow-hidden relative">
+    <div class="absolute top-0 right-0 w-32 h-32 bg-primary-500/5 blur-3xl rounded-full"></div>
+    
+    <form id="filterForm" method="GET" action="dashboard_warga.php" class="flex flex-col lg:flex-row gap-8 items-end relative z-10">
         <input type="hidden" name="page" value="kegiatan">
+        <input type="hidden" name="status" id="statusInput" value="<?= $statusFilter ?>">
         
-        <div class="md:col-span-1">
-            <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Status</label>
-            <select name="status" class="w-full px-4 py-3 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium appearance-none transition-all">
-                <option value="">Semua Status</option>
-                <option value="akan_datang" <?= ($statusFilter=="akan_datang") ? 'selected' : '' ?>>Akan Datang</option>
-                <option value="berlangsung" <?= ($statusFilter=="berlangsung") ? 'selected' : '' ?>>Sedang Berlangsung</option>
-            </select>
-        </div>
-
-        <div class="md:col-span-2">
-            <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Bulan</label>
-            <select name="bulan" class="w-full px-4 py-3 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium appearance-none transition-all">
-                <option value="">Semua Bulan</option>
+        <div class="flex-1 w-full">
+            <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-4 ml-1 flex items-center">
+                <i class="fas fa-layer-group mr-2 text-primary-500"></i>
+                Status Kegiatan
+            </label>
+            <div class="flex flex-wrap gap-2">
                 <?php
-                $bulanIndo = [1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'];
-                foreach ($bulanIndo as $m => $name) {
-                    echo "<option value='$m' ".(($bulanFilter==$m)?'selected':'').">$name</option>";
-                }
+                $statuses = [
+                    '' => ['label' => 'Aktif', 'icon' => 'fa-bolt'],
+                    'akan_datang' => ['label' => 'Mendatang', 'icon' => 'fa-clock'],
+                    'berlangsung' => ['label' => 'Berlangsung', 'icon' => 'fa-play-circle'],
+                    'selesai' => ['label' => 'Selesai', 'icon' => 'fa-check-circle']
+                ];
+                foreach ($statuses as $val => $data):
+                    $active = ($statusFilter == $val);
                 ?>
-            </select>
+                <button type="button" onclick="setStatus('<?= $val ?>')" 
+                    class="group flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-black transition-all duration-300 <?= $active ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/30' : 'bg-secondary-50 text-secondary-500 hover:bg-white hover:shadow-md hover:text-primary-600' ?>">
+                    <i class="fas <?= $data['icon'] ?> text-sm <?= $active ? 'text-white' : 'text-secondary-300 group-hover:text-primary-500' ?>"></i>
+                    <?= $data['label'] ?>
+                </button>
+                <?php endforeach; ?>
+            </div>
         </div>
 
-        <button type="submit" class="w-full px-6 py-3 bg-secondary-900 text-white font-black rounded-2xl hover:bg-secondary-800 transition-all active:scale-95">
-            CARI JADWAL
-        </button>
+        <div class="w-full lg:w-72">
+            <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-4 ml-1 flex items-center">
+                <i class="fas fa-calendar-alt mr-2 text-primary-500"></i>
+                Pilih Periode
+            </label>
+            <div class="relative group">
+                <i class="far fa-calendar absolute left-5 top-1/2 -translate-y-1/2 text-secondary-300 group-focus-within:text-primary-500 transition-colors"></i>
+                <select name="bulan_tahun" onchange="this.form.submit()" 
+                    class="w-full pl-12 pr-12 py-3.5 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-bold appearance-none cursor-pointer transition-all hover:bg-white hover:shadow-sm">
+                    <option value="">Semua Periode</option>
+                    <?php foreach ($availablePeriods as $period): ?>
+                        <option value="<?= $period['value'] ?>" <?= ($bulanTahunFilter == $period['value']) ? 'selected' : '' ?>>
+                            <?= $period['label'] ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <i class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-secondary-300 text-[10px] pointer-events-none group-hover:text-primary-500 transition-colors"></i>
+            </div>
+        </div>
     </form>
 </div>
+
+<script>
+function setStatus(val) {
+    document.getElementById('statusInput').value = val;
+    document.getElementById('filterForm').submit();
+}
+</script>
 
 <!-- Timeline / List Kegiatan -->
 <div class="space-y-6">
@@ -90,8 +138,10 @@ $result = $stmt->get_result();
             $end_time = strtotime($row['tanggal'] . ' ' . $row['jam_selesai']);
             
             $isLive = ($now >= $start_time && $now <= $end_time);
-            $color = $isLive ? "green" : "blue";
-            $statusLabel = $isLive ? "Sedang Berlangsung" : "Terjadwal";
+            $isFinished = ($now > $end_time);
+            
+            $color = $isLive ? "green" : ($isFinished ? "secondary" : "blue");
+            $statusLabel = $isLive ? "Sedang Berlangsung" : ($isFinished ? "Selesai" : "Terjadwal");
         ?>
         <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-secondary-100 hover:shadow-md transition-all group relative overflow-hidden">
             <div class="absolute top-0 left-0 w-2 h-full bg-<?= $color ?>-500"></div>

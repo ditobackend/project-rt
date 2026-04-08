@@ -45,39 +45,49 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <!-- Form Registrasi -->
     <div class="lg:col-span-5">
         <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-secondary-100 sticky top-24">
-            <h3 class="text-xl font-black text-secondary-900 mb-8 border-b border-secondary-50 pb-4">Formulir Pendaftaran</h3>
-            
+            <h3 class="text-xl font-black text-secondary-900 mb-8 border-b border-secondary-50 pb-4">Formulir
+                Pendaftaran</h3>
+
             <?= $message ?>
-            
+
             <form action="" method="POST" class="space-y-6">
                 <div>
-                    <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] mb-2 ml-1">Nama Lengkap</label>
+                    <label
+                        class="block text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] mb-2 ml-1">Nama
+                        Lengkap</label>
                     <input type="text" name="nama" placeholder="Contoh: Budi Santoso" required
-                           class="w-full px-6 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium transition-all placeholder-secondary-300">
+                        class="w-full px-6 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium transition-all placeholder-secondary-300">
                 </div>
-                
+
                 <div>
-                    <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] mb-2 ml-1">Alamat Email</label>
+                    <label
+                        class="block text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] mb-2 ml-1">Alamat
+                        Email</label>
                     <input type="email" name="email" placeholder="budi@example.com" required
-                           class="w-full px-6 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium transition-all placeholder-secondary-300">
+                        class="w-full px-6 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium transition-all placeholder-secondary-300">
                 </div>
-                
+
                 <div>
-                    <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] mb-2 ml-1">Kata Sandi Akses</label>
+                    <label
+                        class="block text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] mb-2 ml-1">Kata
+                        Sandi Akses</label>
                     <input type="password" name="password" placeholder="••••••••" required
-                           class="w-full px-6 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium transition-all placeholder-secondary-300">
+                        class="w-full px-6 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium transition-all placeholder-secondary-300">
                 </div>
-                
+
                 <div>
-                    <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] mb-2 ml-1">Peran Akses</label>
-                    <div class="w-full px-6 py-4 bg-secondary-100/50 border-0 rounded-2xl text-secondary-400 font-black uppercase tracking-widest text-xs flex items-center">
+                    <label
+                        class="block text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] mb-2 ml-1">Peran
+                        Akses</label>
+                    <div
+                        class="w-full px-6 py-4 bg-secondary-100/50 border-0 rounded-2xl text-secondary-400 font-black uppercase tracking-widest text-xs flex items-center">
                         <i class="fas fa-user mr-3"></i> Warga
                     </div>
                 </div>
-                
+
                 <div class="pt-4">
                     <button type="submit"
-                            class="w-full py-5 bg-secondary-900 text-white font-black rounded-2xl hover:bg-secondary-800 transition-all active:scale-95 shadow-xl shadow-secondary-900/10 uppercase tracking-widest text-sm">
+                        class="w-full py-5 bg-secondary-900 text-white font-black rounded-2xl hover:bg-secondary-800 transition-all active:scale-95 shadow-xl shadow-secondary-900/10 uppercase tracking-widest text-sm">
                         Daftarkan Warga
                     </button>
                 </div>
@@ -91,14 +101,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div class="px-8 py-8 border-b border-secondary-50">
                 <h3 class="text-xl font-black text-secondary-900">Warga Terdaftar</h3>
             </div>
-            
+
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-secondary-50/50">
-                            <th class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest">Identitas</th>
-                            <th class="px-6 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest">Kredensial</th>
-                            <th class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest text-right">Peran</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest">
+                                Identitas</th>
+                            <th class="px-6 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest">
+                                Email</th>
+                            <th
+                                class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest text-right">
+                                Peran Akses</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-secondary-50">
