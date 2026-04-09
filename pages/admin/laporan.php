@@ -45,10 +45,6 @@ $laporan = $stmt_laporan->get_result();
             class="inline-flex items-center px-6 py-3 bg-orange-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-700 transition-all shadow-lg shadow-red-500/20 active:scale-95">
             <i class="fas fa-file-pdf mr-2"></i> Ekspor PDF
         </a>
-        <a href="exports/laporan_excel.php" target="_blank"
-            class="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-green-700 transition-all shadow-lg shadow-green-500/20 active:scale-95">
-            <i class="fas fa-file-excel mr-2"></i> Ekspor Excel
-        </a>
     </div>
 </div>
 
