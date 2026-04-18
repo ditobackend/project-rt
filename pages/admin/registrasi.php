@@ -6,11 +6,14 @@ include __DIR__ . '/../../config/database.php';
 
 // Cek apakah admin sudah login
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: ../loginadmin.php");
+    header("Location: loginadmin.php");
     exit;
 }
 
-$message = "";
+// Ambil flash message jika ada
+$message = $_SESSION['flash_msg'] ?? "";
+unset($_SESSION['flash_msg']);
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $nama = trim($_POST['nama']);
     $email = trim($_POST['email']);
@@ -21,17 +24,35 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt->bind_param("ssss", $nama, $email, $password, $role);
 
     if ($stmt->execute()) {
-        $message = "
+        $_SESSION['flash_msg'] = "
         <div class='flex items-center p-4 mb-4 text-green-800 rounded-[1.25rem] bg-green-50 border border-green-100 shadow-sm animate-in fade-in duration-500'>
             <i class='fas fa-check-circle mr-3'></i>
             <span class='text-sm font-bold tracking-tight uppercase'>Account successfully registered.</span>
         </div>";
+        header("Location: dashboard_admin.php?page=registrasi");
+        exit;
     } else {
         $message = "
         <div class='flex items-center p-4 mb-4 text-red-800 rounded-[1.25rem] bg-red-50 border border-red-100 shadow-sm animate-in fade-in duration-500'>
             <i class='fas fa-exclamation-circle mr-3'></i>
             <span class='text-sm font-bold tracking-tight uppercase tracking-widest'>Error: " . $stmt->error . "</span>
         </div>";
+    }
+}
+
+// Proses Hapus User
+if (isset($_GET['hapus'])) {
+    $id = intval($_GET['hapus']);
+    $stmt = $conn->prepare("DELETE FROM users WHERE id = ? AND role = 'warga'");
+    $stmt->bind_param("i", $id);
+    if ($stmt->execute()) {
+        $_SESSION['flash_msg'] = "
+        <div class='flex items-center p-4 mb-4 text-green-800 rounded-[1.25rem] bg-green-50 border border-green-100 shadow-sm animate-in fade-in duration-500'>
+            <i class='fas fa-check-circle mr-3'></i>
+            <span class='text-sm font-bold tracking-tight uppercase'>Akun berhasil dihapus.</span>
+        </div>";
+        header("Location: dashboard_admin.php?page=registrasi");
+        exit;
     }
 }
 ?>
@@ -111,13 +132,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             <th class="px-6 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest">
                                 Email</th>
                             <th
-                                class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest text-right">
+                                class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest">
                                 Peran Akses</th>
+                            <th
+                                class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest text-right">
+                                Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-secondary-50">
                         <?php
-                        $result = mysqli_query($conn, "SELECT nama, email, role FROM users WHERE role = 'warga' ORDER BY id DESC");
+                        $result = mysqli_query($conn, "SELECT id, nama, email, role FROM users WHERE role = 'warga' ORDER BY id DESC");
                         if (mysqli_num_rows($result) > 0) {
                             while ($row = mysqli_fetch_assoc($result)) {
                                 $avatar = substr($row['nama'], 0, 1);
@@ -130,13 +154,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                             </div>
                                         </td>
                                         <td class='px-6 py-5 text-sm text-secondary-500 font-medium'>{$row['email']}</td>
-                                        <td class='px-8 py-5 text-right'>
+                                        <td class='px-8 py-5'>
                                             <span class='text-[10px] font-black uppercase tracking-widest text-primary-600 bg-primary-50 px-3 py-1 rounded-full'>$roleDisplay</span>
+                                        </td>
+                                        <td class='px-8 py-5 text-right'>
+                                            <button onclick='confirmDelete({$row['id']}, \"{$row['nama']}\")' class='p-2 text-secondary-300 hover:text-red-500 transition-colors'>
+                                                <i class='fas fa-trash-alt'></i>
+                                            </button>
                                         </td>
                                       </tr>";
                             }
                         } else {
-                            echo "<tr><td colspan='3' class='px-8 py-20 text-center text-secondary-300 font-bold'>Belum ada data warga terdaftar.</td></tr>";
+                            echo "<tr><td colspan='4' class='px-8 py-20 text-center text-secondary-300 font-bold'>Belum ada data warga terdaftar.</td></tr>";
                         }
                         ?>
                     </tbody>
@@ -145,3 +174,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
     </div>
 </div>
+
+<script>
+function confirmDelete(id, nama) {
+    Swal.fire({
+        title: 'Hapus Akun?',
+        text: "Akun warga '" + nama + "' akan dihapus secara permanen dari sistem!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Ya, Hapus Akun',
+        cancelButtonText: 'Batal',
+        background: '#ffffff',
+        customClass: {
+            popup: 'rounded-[2.5rem] shadow-xl border-0',
+            confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
+            cancelButton: 'rounded-xl px-6 py-2.5 font-bold'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "?page=registrasi&hapus=" + id;
+        }
+    })
+}
+</script>

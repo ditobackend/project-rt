@@ -7,13 +7,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'warga') {
 $page = $_GET['page'] ?? 'dashboard';
 ?>
 
-<!DOCTYPE html>
-<html lang="id">
-
-<head>
-    <?php include 'includes/header.php'; ?>
-    <title>Portal Warga - RT 06/08 Serua Indah</title>
-</head>
+<?php include 'includes/header.php'; ?>
 
 <body class="bg-secondary-50 font-sans text-secondary-900 antialiased scroll-smooth">
 

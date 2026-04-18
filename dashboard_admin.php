@@ -26,54 +26,63 @@ $page = $_GET['page'] ?? 'dashboard';
         <!-- Sidebar Desktop -->
         <aside
             class="hidden md:flex flex-col w-72 bg-secondary-900 text-white transition-all duration-300 ease-in-out z-30">
-            <div class="p-8">
-                <div class="flex items-center space-x-3 mb-10">
-                    <div class="bg-primary-500 p-2 rounded-xl shadow-lg shadow-primary-500/30">
-                        <i class="fas fa-user-shield text-xl"></i>
+            <div class="flex flex-col h-full">
+                <div class="p-8 pb-4">
+                    <div class="flex items-center space-x-3 mb-8">
+                        <div class="bg-primary-500 p-2 rounded-xl shadow-lg shadow-primary-500/30">
+                            <i class="fas fa-user-shield text-xl"></i>
+                        </div>
+                        <span class="text-xl font-bold tracking-tight">Portal Admin</span>
                     </div>
-                    <span class="text-xl font-bold tracking-tight">Portal Admin</span>
                 </div>
 
-                <nav class="space-y-2">
-                    <a href="?page=dashboard"
-                        class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'dashboard' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
-                        <i class="fas fa-tachometer-alt w-6"></i>
-                        <span class="font-medium">Dashboard Utama</span>
-                    </a>
-                    <a href="?page=kegiatan"
-                        class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
-                        <i class="fas fa-calendar-alt w-6"></i>
-                        <span class="font-medium">Data Kegiatan</span>
-                    </a>
-                    <a href="?page=keuangan"
-                        class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'keuangan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
-                        <i class="fas fa-chart-line w-6"></i>
-                        <span class="font-medium">Data Keuangan</span>
-                    </a>
-                    <a href="?page=pengaduan"
-                        class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'pengaduan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
-                        <i class="fas fa-comment-dots w-6"></i>
-                        <span class="font-medium">Pengaduan Warga</span>
-                    </a>
-                    <a href="?page=registrasi"
-                        class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'registrasi' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
-                        <i class="fas fa-user-plus w-6"></i>
-                        <span class="font-medium">Registrasi Warga</span>
-                    </a>
-                    <a href="?page=laporan"
-                        class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'laporan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
-                        <i class="fas fa-file-alt w-6"></i>
-                        <span class="font-medium">Laporan Akuntansi</span>
-                    </a>
-                </nav>
-            </div>
+                <div class="flex-1 overflow-y-auto px-8 custom-scrollbar">
+                    <nav class="space-y-2 pb-8">
+                        <a href="?page=dashboard"
+                            class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'dashboard' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
+                            <i class="fas fa-tachometer-alt w-6"></i>
+                            <span class="font-medium">Dashboard Utama</span>
+                        </a>
+                        <a href="?page=kegiatan"
+                            class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
+                            <i class="fas fa-calendar-alt w-6"></i>
+                            <span class="font-medium">Data Kegiatan</span>
+                        </a>
+                        <a href="?page=keuangan"
+                            class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'keuangan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
+                            <i class="fas fa-chart-line w-6"></i>
+                            <span class="font-medium">Data Keuangan</span>
+                        </a>
+                        <a href="?page=pengaduan"
+                            class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'pengaduan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
+                            <i class="fas fa-comment-dots w-6"></i>
+                            <span class="font-medium">Pengaduan Warga</span>
+                        </a>
+                        <a href="?page=registrasi"
+                            class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'registrasi' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
+                            <i class="fas fa-user-plus w-6"></i>
+                            <span class="font-medium">Registrasi Warga</span>
+                        </a>
+                        <a href="?page=laporan"
+                            class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'laporan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
+                            <i class="fas fa-file-alt w-6"></i>
+                            <span class="font-medium">Laporan Akuntansi</span>
+                        </a>
+                        <a href="?page=pengaturan"
+                            class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all <?= $page == 'pengaturan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-secondary-800' ?>">
+                            <i class="fas fa-cog w-6"></i>
+                            <span class="font-medium">Pengaturan Sistem</span>
+                        </a>
+                    </nav>
+                </div>
 
-            <div class="mt-auto p-8">
-                <button onclick="confirmLogout()"
-                    class="flex items-center justify-center space-x-3 px-4 py-3 w-full rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
-                    <i class="fas fa-sign-out-alt w-6"></i>
-                    <span class="font-medium">Keluar</span>
-                </button>
+                <div class="p-8">
+                    <button onclick="confirmLogout()"
+                        class="flex items-center justify-center space-x-3 px-4 py-3 w-full rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                        <i class="fas fa-sign-out-alt w-6"></i>
+                        <span class="font-medium">Keluar</span>
+                    </button>
+                </div>
             </div>
         </aside>
 
