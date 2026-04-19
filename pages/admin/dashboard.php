@@ -22,7 +22,7 @@ $sqlPengeluaranBulanIni = $conn->query("SELECT SUM(jumlah) as total FROM keuanga
 $pengeluaranBulanIni = $sqlPengeluaranBulanIni->fetch_assoc()['total'] ?? 0;
 
 // Riwayat Aktivitas Terbaru
-$queryAktivitas = $conn->query("SELECT * FROM keuangan ORDER BY tanggal DESC, id DESC LIMIT 5");
+$queryAktivitas = $conn->query("SELECT * FROM keuangan ORDER BY tanggal DESC, id DESC LIMIT 15");
 
 // Data Kegiatan Terbaru/Mendatang (Otomatis Hilang Jika Sudah Selesai)
 $queryKegiatan = $conn->query("SELECT *, 
@@ -34,7 +34,7 @@ $queryKegiatan = $conn->query("SELECT *,
     FROM kegiatan 
     WHERE CONCAT(tanggal, ' ', jam_selesai) >= NOW() 
     ORDER BY tanggal ASC, jam_mulai ASC 
-    LIMIT 3");
+    LIMIT 10");
 ?>
 
 <div class="mb-10">
@@ -136,53 +136,55 @@ $queryKegiatan = $conn->query("SELECT *,
                 <a href="?page=keuangan" class="text-sm font-bold text-black-600 hover:underline">Lihat Semua</a>
             </div>
 
-            <div
-                class="relative pl-8 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-secondary-100">
-                <?php
-                if ($queryAktivitas->num_rows > 0):
-                    while ($akt = $queryAktivitas->fetch_assoc()):
-                        $isIncome = ($akt['jenis'] == 'pemasukan');
-                        $color = $isIncome ? "green" : "red";
-                        $icon = $isIncome ? "fa-arrow-down" : "fa-arrow-up";
-
-                        // Parse name/cat
-                        $parts = explode(' - ', $akt['keterangan'], 3);
-                        $title = "Transaksi Keuangan";
-                        $subtitle = $akt['keterangan'];
-                        if (count($parts) >= 2) {
-                            $title = $parts[0] != '-' ? $parts[0] : $parts[1];
-                            $subtitle = $parts[count($parts) - 1];
-                        }
-                        ?>
-                        <div class="relative group">
-                            <div
-                                class="absolute -left-[27px] top-1 w-[13px] h-[13px] rounded-full bg-<?= $color ?>-500 ring-4 ring-<?= $color ?>-50 group-hover:scale-125 transition-all">
-                            </div>
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="font-bold text-secondary-900 group-hover:text-primary-600 transition-colors">
-                                        <?= htmlspecialchars($title) ?></p>
-                                    <p class="text-sm text-secondary-500 font-medium"><?= htmlspecialchars($subtitle) ?></p>
-                                    <span
-                                        class="inline-block mt-2 text-[10px] font-black uppercase tracking-widest text-secondary-400 bg-secondary-50 px-2 py-0.5 rounded"><?= date('d M Y', strtotime($akt['tanggal'])) ?></span>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-black text-<?= $color ?>-600"><?= ($isIncome ? '+' : '-') ?> Rp
-                                        <?= number_format($akt['jumlah'], 0, ',', '.') ?></p>
-                                    <span
-                                        class="text-[10px] font-bold text-<?= $color ?>-500/50 uppercase"><?= $isIncome ? 'MASUK' : 'KELUAR' ?></span>
-                                </div>
-                            </div>
-                        </div>
+            <div class="max-h-[420px] overflow-y-auto custom-scrollbar pr-4">
+                <div
+                    class="relative pl-8 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-secondary-100">
                     <?php
-                    endwhile;
-                else:
-                    ?>
-                    <div class="text-center py-10">
-                        <i class="fas fa-box-open text-4xl text-secondary-200 mb-4 block"></i>
-                        <p class="text-secondary-400 font-medium">Tidak ada aktivitas terbaru.</p>
-                    </div>
-                <?php endif; ?>
+                    if ($queryAktivitas->num_rows > 0):
+                        while ($akt = $queryAktivitas->fetch_assoc()):
+                            $isIncome = ($akt['jenis'] == 'pemasukan');
+                            $color = $isIncome ? "green" : "red";
+                            $icon = $isIncome ? "fa-arrow-down" : "fa-arrow-up";
+    
+                            // Parse name/cat
+                            $parts = explode(' - ', $akt['keterangan'], 3);
+                            $title = "Transaksi Keuangan";
+                            $subtitle = $akt['keterangan'];
+                            if (count($parts) >= 2) {
+                                $title = $parts[0] != '-' ? $parts[0] : $parts[1];
+                                $subtitle = $parts[count($parts) - 1];
+                            }
+                            ?>
+                            <div class="relative group">
+                                <div
+                                    class="absolute -left-[27px] top-1 w-[13px] h-[13px] rounded-full bg-<?= $color ?>-500 ring-4 ring-<?= $color ?>-50 group-hover:scale-125 transition-all">
+                                </div>
+                                <div class="flex justify-between items-start transition-all duration-300 group-hover:translate-x-1">
+                                    <div>
+                                        <p class="font-bold text-secondary-900 group-hover:text-primary-600 transition-colors">
+                                            <?= htmlspecialchars($title) ?></p>
+                                        <p class="text-sm text-secondary-500 font-medium"><?= htmlspecialchars($subtitle) ?></p>
+                                        <span
+                                            class="inline-block mt-2 text-[10px] font-black uppercase tracking-widest text-secondary-400 bg-secondary-50 px-2 py-0.5 rounded"><?= date('d M Y', strtotime($akt['tanggal'])) ?></span>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-black text-<?= $color ?>-600"><?= ($isIncome ? '+' : '-') ?> Rp
+                                            <?= number_format($akt['jumlah'], 0, ',', '.') ?></p>
+                                        <span
+                                            class="text-[10px] font-bold text-<?= $color ?>-500/50 uppercase"><?= $isIncome ? 'MASUK' : 'KELUAR' ?></span>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php
+                        endwhile;
+                    else:
+                        ?>
+                        <div class="text-center py-10">
+                            <i class="fas fa-box-open text-4xl text-secondary-200 mb-4 block"></i>
+                            <p class="text-secondary-400 font-medium">Tidak ada aktivitas terbaru.</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
@@ -197,41 +199,43 @@ $queryKegiatan = $conn->query("SELECT *,
                 Informasi Kegiatan
             </h3>
 
-            <div class="space-y-4 relative z-10">
-                <?php if ($queryKegiatan->num_rows > 0): ?>
-                    <?php while ($kgt = $queryKegiatan->fetch_assoc()): 
-                        $isLive = ($kgt['status_realtime'] === 'live');
-                        ?>
-                        <div class="p-4 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/5 hover:bg-white/10 hover:border-primary-500/50 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary-500/10 transition-all duration-300 group cursor-default">
-                            <div class="flex justify-between items-start">
-                                <div class="flex flex-col">
-                                    <?php if ($isLive): ?>
-                                        <span class="flex items-center text-[9px] font-black text-emerald-400 uppercase tracking-[0.2em] mb-1">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
-                                            Sedang Berlangsung
-                                        </span>
-                                    <?php endif; ?>
-                                    <p class="text-white font-bold group-hover:text-primary-400 transition-colors uppercase text-sm tracking-wide">
-                                        <?= htmlspecialchars($kgt['judul']) ?>
-                                    </p>
+            <div class="max-h-[350px] overflow-y-auto custom-scrollbar pr-2">
+                <div class="space-y-4 relative z-10">
+                    <?php if ($queryKegiatan->num_rows > 0): ?>
+                        <?php while ($kgt = $queryKegiatan->fetch_assoc()): 
+                            $isLive = ($kgt['status_realtime'] === 'live');
+                            ?>
+                            <div class="p-4 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/5 hover:bg-white/10 hover:border-primary-500/50 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary-500/10 transition-all duration-300 group cursor-default">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex flex-col">
+                                        <?php if ($isLive): ?>
+                                            <span class="flex items-center text-[9px] font-black text-emerald-400 uppercase tracking-[0.2em] mb-1">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
+                                                Sedang Berlangsung
+                                            </span>
+                                        <?php endif; ?>
+                                        <p class="text-white font-bold group-hover:text-primary-400 transition-colors uppercase text-sm tracking-wide">
+                                            <?= htmlspecialchars($kgt['judul']) ?>
+                                        </p>
+                                    </div>
+                                    <i class="fas fa-arrow-right text-xs text-primary-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
                                 </div>
-                                <i class="fas fa-arrow-right text-xs text-primary-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+                                <div class="flex items-center mt-2 text-xs text-secondary-400 font-medium">
+                                    <i class="far fa-calendar-alt mr-2 text-primary-500"></i>
+                                    <?= date('d M Y', strtotime($kgt['tanggal'])) ?>
+                                    <span class="mx-2 text-secondary-600">•</span>
+                                    <i class="far fa-clock mr-2 text-primary-500"></i>
+                                    <?= date('H:i', strtotime($kgt['jam_mulai'])) ?>
+                                </div>
                             </div>
-                            <div class="flex items-center mt-2 text-xs text-secondary-400 font-medium">
-                                <i class="far fa-calendar-alt mr-2 text-primary-500"></i>
-                                <?= date('d M Y', strtotime($kgt['tanggal'])) ?>
-                                <span class="mx-2 text-secondary-600">•</span>
-                                <i class="far fa-clock mr-2 text-primary-500"></i>
-                                <?= date('H:i', strtotime($kgt['jam_mulai'])) ?>
-                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <div class="text-center py-6">
+                            <i class="fas fa-calendar-times text-3xl text-secondary-700 mb-3 block"></i>
+                            <p class="text-secondary-500 text-sm font-medium">Belum ada kegiatan mendatang.</p>
                         </div>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <div class="text-center py-6">
-                        <i class="fas fa-calendar-times text-3xl text-secondary-700 mb-3 block"></i>
-                        <p class="text-secondary-500 text-sm font-medium">Belum ada kegiatan mendatang.</p>
-                    </div>
-                <?php endif; ?>
+                    <?php endif; ?>
+                </div>
             </div>
 
             <div class="mt-8">

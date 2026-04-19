@@ -10,8 +10,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tambah_pengeluaran'])
     
     $keterangan = "Admin - $jenis_pengeluaran - $nama_pengeluaran";
     
-    $stmt = $conn->prepare("INSERT INTO keuangan (tanggal, keterangan, jenis, jumlah) VALUES (?, ?, 'pengeluaran', ?)");
-    $stmt->bind_param("ssd", $tanggal, $keterangan, $jumlah);
+    $admin_id = $_SESSION['user_id'];
+    
+    $stmt = $conn->prepare("INSERT INTO keuangan (tanggal, keterangan, jenis, jumlah, admin_id) VALUES (?, ?, 'pengeluaran', ?, ?)");
+    $stmt->bind_param("ssdi", $tanggal, $keterangan, $jumlah, $admin_id);
     if($stmt->execute()) {
         echo "<script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -118,7 +120,7 @@ if (!empty($filter_bulan) && $filter_bulan != 'semua') {
 }
 
 $whereClause = count($where) > 0 ? "WHERE " . implode(" AND ", $where) : "";
-$query_transaksi = "SELECT * FROM keuangan $whereClause ORDER BY tanggal DESC, id DESC";
+$query_transaksi = "SELECT k.*, u.nama as nama_admin FROM keuangan k LEFT JOIN users u ON k.admin_id = u.id $whereClause ORDER BY k.tanggal DESC, k.id DESC";
 $stmt_transaksi = $conn->prepare($query_transaksi);
 if (!empty($params)) {
     $stmt_transaksi->bind_param($types, ...$params);
@@ -210,10 +212,10 @@ $transaksi = $stmt_transaksi->get_result();
 
 <!-- Table Container -->
 <div class="bg-white rounded-[2rem] shadow-sm border border-secondary-100 overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-secondary-50/50">
+    <div class="overflow-x-auto max-h-[550px] overflow-y-auto custom-scrollbar">
+        <table class="w-full text-left border-separate border-spacing-0">
+            <thead class="sticky top-0 z-10">
+                <tr class="bg-secondary-50">
                     <th class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] border-b border-secondary-100">Subjek/Nama</th>
                     <th class="px-6 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] border-b border-secondary-100">Tanggal</th>
                     <th class="px-6 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] border-b border-secondary-100">Kategori</th>
@@ -236,6 +238,11 @@ $transaksi = $stmt_transaksi->get_result();
                     <tr class="group hover:bg-primary-50/30 transition-all">
                         <td class="px-8 py-5">
                             <p class="font-bold text-secondary-900"><?= htmlspecialchars($name) ?></p>
+                            <?php if (!empty($row['nama_admin'])): ?>
+                                <p class="text-[9px] font-black text-red-500 uppercase tracking-widest mt-1">
+                                    <i class="fas fa-user-edit mr-1"></i> <?= htmlspecialchars($row['nama_admin']) ?>
+                                </p>
+                            <?php endif; ?>
                         </td>
                         <td class="px-6 py-5">
                             <p class="text-sm font-medium text-secondary-500"><?= date('d M Y', strtotime($row['tanggal'])) ?></p>

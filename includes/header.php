@@ -79,10 +79,25 @@ if ($role === 'warga') {
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
+        .sidebar-link {
+            transition: all 0.2s ease-in-out;
+            position: relative;
+        }
         .sidebar-active {
-            background: linear-gradient(to right, <?= $sidebarGradient[0] ?>, <?= $sidebarGradient[1] ?>);
-            color: white !important;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            background: <?= $role === 'admin' ? 'rgba(79, 70, 229, 0.1)' : 'rgba(16, 185, 129, 0.1)' ?> !important;
+            color: <?= $primaryPalette[500] ?> !important;
+            font-weight: 600;
+        }
+        .sidebar-active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 15%;
+            height: 70%;
+            width: 4px;
+            background: <?= $primaryPalette[500] ?>;
+            border-radius: 0 4px 4px 0;
+            box-shadow: 2px 0 10px <?= $primaryPalette[500] ?>;
         }
         .card-modern:hover {
             transform: translateY(-5px);

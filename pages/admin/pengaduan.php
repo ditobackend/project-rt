@@ -39,10 +39,10 @@ $result = $conn->query($sql);
 
 <!-- Table Container -->
 <div class="bg-white rounded-[2rem] shadow-sm border border-secondary-100 overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-secondary-50/50">
+    <div class="overflow-x-auto max-h-[550px] overflow-y-auto custom-scrollbar">
+        <table class="w-full text-left border-separate border-spacing-0">
+            <thead class="sticky top-0 z-10">
+                <tr class="bg-secondary-50">
                     <th class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] border-b border-secondary-100">Pelapor</th>
                     <th class="px-6 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] border-b border-secondary-100">Judul Laporan</th>
                     <th class="px-6 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] border-b border-secondary-100">Deskripsi</th>

@@ -11,7 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Update pembayaran
         $stmt = $conn->prepare("UPDATE pembayaran SET status = ? WHERE order_id = ?");
         $stmt->bind_param("ss", $status, $order_id);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            file_put_contents('payment_error.log', "[" . date('Y-m-d H:i:s') . "] Update pembayaran failed: " . $stmt->error . "\n", FILE_APPEND);
+        }
 
         // Jika berhasil, ambil data dan tambahkan ke keuangan
         if ($status == 'berhasil') {
@@ -43,17 +45,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if ($existing->num_rows === 0) {
                     $keuangan_stmt = $conn->prepare("INSERT INTO keuangan (tanggal, keterangan, jenis, jumlah) VALUES (CURDATE(), ?, 'pemasukan', ?)");
                     $keuangan_stmt->bind_param("sd", $keterangan, $jumlah);
-                    $keuangan_stmt->execute();
+                    if (!$keuangan_stmt->execute()) {
+                        file_put_contents('payment_error.log', "[" . date('Y-m-d H:i:s') . "] Insert keuangan failed: " . $keuangan_stmt->error . "\n", FILE_APPEND);
+                    }
                     $keuangan_stmt->close();
+                } else {
+                    file_put_contents('payment_error.log', "[" . date('Y-m-d H:i:s') . "] Duplicate entry for keuangan skipped: $keterangan\n", FILE_APPEND);
                 }
 
                 $cek_keuangan->close();
+            } else {
+                file_put_contents('payment_error.log', "[" . date('Y-m-d H:i:s') . "] Order ID $order_id not found in pembayaran\n", FILE_APPEND);
             }
             $select_stmt->close();
         }
 
         $stmt->close();
         echo json_encode(['success' => true]);
+
     } else {
         echo json_encode(['success' => false, 'error' => 'Order ID missing']);
     }

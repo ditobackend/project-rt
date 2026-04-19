@@ -15,8 +15,10 @@ if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin') {
         $penyelenggara = $_POST['penyelenggara'];
         $status = $_POST['status'];
 
-        $stmt = $conn->prepare("INSERT INTO kegiatan (judul, deskripsi, tanggal, jam_mulai, jam_selesai, penyelenggara, status) VALUES (?,?,?,?,?,?,?)");
-        $stmt->bind_param("sssssss", $judul, $deskripsi, $tanggal, $jam_mulai, $jam_selesai, $penyelenggara, $status);
+        $admin_id = $_SESSION['user_id'];
+
+        $stmt = $conn->prepare("INSERT INTO kegiatan (judul, deskripsi, tanggal, jam_mulai, jam_selesai, penyelenggara, status, admin_id) VALUES (?,?,?,?,?,?,?,?)");
+        $stmt->bind_param("sssssssi", $judul, $deskripsi, $tanggal, $jam_mulai, $jam_selesai, $penyelenggara, $status, $admin_id);
         $stmt->execute();
 
         echo "<script>window.location.href='dashboard_admin.php?page=kegiatan';</script>";
@@ -104,7 +106,7 @@ if (!empty($bulanTahunFilter)) {
     $types .= "s";
 }
 
-$sql = "SELECT * FROM kegiatan";
+$sql = "SELECT k.*, u.nama as nama_admin FROM kegiatan k LEFT JOIN users u ON k.admin_id = u.id";
 if ($where) {
     $sql .= " WHERE " . implode(" AND ", $where);
 }
@@ -208,10 +210,10 @@ $result = $stmt->get_result();
 
 <!-- Table Container -->
 <div class="bg-white rounded-[2rem] shadow-sm border border-secondary-100 overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-secondary-50/50">
+    <div class="overflow-x-auto max-h-[550px] overflow-y-auto custom-scrollbar">
+        <table class="w-full text-left border-separate border-spacing-0">
+            <thead class="sticky top-0 z-10">
+                <tr class="bg-secondary-50">
                     <th
                         class="px-8 py-5 text-xs font-black text-secondary-400 uppercase tracking-widest border-b border-secondary-100">
                         Detail Kegiatan</th>
@@ -245,6 +247,11 @@ $result = $stmt->get_result();
                                         <p class="text-xs text-secondary-400 line-clamp-1 max-w-[200px]">
                                             <?= htmlspecialchars($row['deskripsi']) ?>
                                         </p>
+                                        <?php if (!empty($row['nama_admin'])): ?>
+                                            <p class="text-[9px] font-black text-primary-500 uppercase tracking-widest mt-2">
+                                                <i class="fas fa-user-edit mr-1"></i> <?= htmlspecialchars($row['nama_admin']) ?>
+                                            </p>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </td>

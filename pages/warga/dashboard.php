@@ -28,10 +28,10 @@ $queryKegiatan = $conn->query("SELECT *,
     FROM kegiatan 
     WHERE CONCAT(tanggal, ' ', jam_selesai) >= NOW() 
     ORDER BY tanggal ASC, jam_mulai ASC 
-    LIMIT 3");
+    LIMIT 10");
 
 // Aktivitas Terakhir (Keuangan)
-$queryAktivitas = $conn->query("SELECT * FROM keuangan ORDER BY tanggal DESC, id DESC LIMIT 5");
+$queryAktivitas = $conn->query("SELECT * FROM keuangan ORDER BY tanggal DESC, id DESC LIMIT 15");
 ?>
 
 <div class="mb-10">
@@ -110,52 +110,54 @@ $queryAktivitas = $conn->query("SELECT * FROM keuangan ORDER BY tanggal DESC, id
                 <a href="?page=kegiatan" class="text-sm font-bold text-primary-600 hover:underline">Lihat Semua</a>
             </div>
 
-            <div class="grid md:grid-cols-1 gap-4">
-                <?php if ($queryKegiatan->num_rows > 0): ?>
-                    <?php while ($kgt = $queryKegiatan->fetch_assoc()): ?>
-                        <div
-                            class="p-6 bg-secondary-50 hover:bg-primary-50/50 rounded-2xl transition-all border border-transparent hover:border-primary-100 group">
-                            <div class="flex items-center gap-5">
-                                <div
-                                    class="bg-white w-14 h-14 rounded-2xl flex flex-col items-center justify-center shadow-sm text-secondary-900 group-hover:bg-primary-600 group-hover:text-white transition-all">
-                                    <span
-                                        class="text-xs font-black uppercase"><?= date('M', strtotime($kgt['tanggal'])) ?></span>
-                                    <span
-                                        class="text-xl font-black leading-none"><?= date('d', strtotime($kgt['tanggal'])) ?></span>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="font-bold text-secondary-900 group-hover:text-primary-700 transition-colors">
-                                        <?= htmlspecialchars($kgt['judul']) ?>
-                                    </p>
-                                    <div class="flex items-center gap-4 mt-1">
-                                        <span class="text-xs font-medium text-secondary-400 flex items-center">
-                                            <i class="far fa-clock mr-1.5 text-primary-500"></i>
-                                            <?= substr($kgt['jam_mulai'], 0, 5) ?> - <?= substr($kgt['jam_selesai'], 0, 5) ?>
-                                            WIB
-                                        </span>
-                                        <?php if ($kgt['status_realtime'] === 'live'): ?>
-                                            <span
-                                                class="flex items-center text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded-lg ring-1 ring-emerald-500/20">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
-                                                Berlangsung
-                                            </span>
-                                        <?php else: ?>
-                                            <span
-                                                class="text-xs font-black uppercase tracking-widest text-primary-500">MENDATANG</span>
-                                        <?php endif; ?>
+            <div class="max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                <div class="grid md:grid-cols-1 gap-4">
+                    <?php if ($queryKegiatan->num_rows > 0): ?>
+                        <?php while ($kgt = $queryKegiatan->fetch_assoc()): ?>
+                            <div
+                                class="p-6 bg-secondary-50 hover:bg-primary-50/50 rounded-2xl transition-all border border-transparent hover:border-primary-100 group">
+                                <div class="flex items-center gap-5">
+                                    <div
+                                        class="bg-white w-14 h-14 rounded-2xl flex flex-col items-center justify-center shadow-sm text-secondary-900 group-hover:bg-primary-600 group-hover:text-white transition-all">
+                                        <span
+                                            class="text-xs font-black uppercase"><?= date('M', strtotime($kgt['tanggal'])) ?></span>
+                                        <span
+                                            class="text-xl font-black leading-none"><?= date('d', strtotime($kgt['tanggal'])) ?></span>
                                     </div>
+                                    <div class="flex-1">
+                                        <p class="font-bold text-secondary-900 group-hover:text-primary-700 transition-colors">
+                                            <?= htmlspecialchars($kgt['judul']) ?>
+                                        </p>
+                                        <div class="flex items-center gap-4 mt-1">
+                                            <span class="text-xs font-medium text-secondary-400 flex items-center">
+                                                <i class="far fa-clock mr-1.5 text-primary-500"></i>
+                                                <?= substr($kgt['jam_mulai'], 0, 5) ?> - <?= substr($kgt['jam_selesai'], 0, 5) ?>
+                                                WIB
+                                            </span>
+                                            <?php if ($kgt['status_realtime'] === 'live'): ?>
+                                                <span
+                                                    class="flex items-center text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded-lg ring-1 ring-emerald-500/20">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+                                                    Berlangsung
+                                                </span>
+                                            <?php else: ?>
+                                                <span
+                                                    class="text-xs font-black uppercase tracking-widest text-primary-500">MENDATANG</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                    <i
+                                        class="fas fa-chevron-right text-secondary-200 group-hover:translate-x-1 transition-transform"></i>
                                 </div>
-                                <i
-                                    class="fas fa-chevron-right text-secondary-200 group-hover:translate-x-1 transition-transform"></i>
                             </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <div class="text-center py-10">
+                            <i class="fas fa-calendar-xmark text-5xl text-secondary-100 mb-4 block"></i>
+                            <p class="text-secondary-400 font-bold">Belum ada kegiatan yang direncanakan.</p>
                         </div>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <div class="text-center py-10">
-                        <i class="fas fa-calendar-xmark text-5xl text-secondary-100 mb-4 block"></i>
-                        <p class="text-secondary-400 font-bold">Belum ada kegiatan yang direncanakan.</p>
-                    </div>
-                <?php endif; ?>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
@@ -168,34 +170,37 @@ $queryAktivitas = $conn->query("SELECT * FROM keuangan ORDER BY tanggal DESC, id
                 Catatan Dana
             </h3>
 
-            <div
-                class="space-y-6 relative before:absolute before:left-[15px] before:top-2 before:bottom-2 before:w-0.5 before:bg-secondary-50">
-                <?php
-                if ($queryAktivitas->num_rows > 0):
-                    while ($akt = $queryAktivitas->fetch_assoc()):
-                        $isInc = ($akt['jenis'] == 'pemasukan');
-                        $color = $isInc ? "green" : "red";
-                        ?>
-                        <div class="relative pl-10 group">
-                            <div
-                                class="absolute left-0 top-1.5 w-[31px] h-[31px] rounded-full bg-white border-2 border-<?= $color ?>-500 flex items-center justify-center z-10">
-                                <i
-                                    class="fas fa-<?= $isInc ? 'arrow-down' : 'arrow-up' ?> text-[10px] text-<?= $color ?>-500"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold text-secondary-900 leading-tight">
-                                    <?= htmlspecialchars($akt['keterangan']) ?></p>
-                                <div class="flex justify-between items-center mt-1">
-                                    <span
-                                        class="text-[10px] font-medium text-secondary-400 capitalize"><?= date('d M Y', strtotime($akt['tanggal'])) ?></span>
-                                    <span class="text-xs font-black text-<?= $color ?>-600"><?= $isInc ? '+' : '-' ?> Rp
-                                        <?= number_format($akt['jumlah'], 0, ',', '.') ?></span>
+            <div class="max-h-[400px] overflow-y-auto custom-scrollbar pr-4">
+                <div
+                    class="space-y-6 relative before:absolute before:left-[15px] before:top-2 before:bottom-2 before:w-0.5 before:bg-secondary-50">
+                    <?php
+                    if ($queryAktivitas->num_rows > 0):
+                        while ($akt = $queryAktivitas->fetch_assoc()):
+                            $isInc = ($akt['jenis'] == 'pemasukan');
+                            $color = $isInc ? "green" : "red";
+                            ?>
+                            <div class="relative pl-10 group">
+                                <div
+                                    class="absolute left-0 top-1.5 w-[31px] h-[31px] rounded-full bg-white border-2 border-<?= $color ?>-500 flex items-center justify-center z-10">
+                                    <i
+                                        class="fas fa-<?= $isInc ? 'arrow-down' : 'arrow-up' ?> text-[10px] text-<?= $color ?>-500"></i>
+                                </div>
+                                <div class="transition-all duration-300 group-hover:translate-x-1">
+                                    <p class="text-sm font-bold text-secondary-900 leading-tight">
+                                        <?= htmlspecialchars($akt['keterangan']) ?></p>
+                                    <div class="flex justify-between items-center mt-1">
+                                        <span
+                                            class="text-[10px] font-medium text-secondary-400 capitalize"><?= date('d M Y', strtotime($akt['tanggal'])) ?></span>
+                                        <span class="text-xs font-black text-<?= $color ?>-600"><?= $isInc ? '+' : '-' ?> Rp
+                                            <?= number_format($akt['jumlah'], 0, ',', '.') ?></span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    <?php endwhile; else: ?>
-                    <p class="text-secondary-400 text-center text-sm font-medium">Belum ada data keuangan.</p>
-                <?php endif; ?>
+                        <?php endwhile;
+                    else: ?>
+                        <p class="text-secondary-400 text-center text-sm font-medium">Belum ada data keuangan.</p>
+                    <?php endif; ?>
+                </div>
             </div>
 
             <div class="mt-8">

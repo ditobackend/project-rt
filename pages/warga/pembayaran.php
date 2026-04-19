@@ -207,15 +207,23 @@ $bank_atas_nama = $settings['rek_bank_atas_nama'] ?? 'a.n. Kas RT 06/08';
                     <textarea name="catatan" placeholder="Tambahkan keterangan jika perlu..."
                         class="w-full px-5 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-medium transition-all resize-none h-24"></textarea>
                 </div>
-
-                <div class="pt-4">
+                <div class="pt-6">
                     <button type="submit"
-                        class="w-full py-5 bg-primary-600 hover:bg-primary-700 text-white font-black rounded-2xl shadow-xl shadow-primary-500/20 transition-all uppercase tracking-widest text-sm flex items-center justify-center gap-3 active:scale-95">
-                        <i class="fas fa-shield-alt"></i>
-                        Proses Pembayaran Aman
+                        class="w-full py-5 px-6 bg-gradient-to-br from-primary-600 to-primary-700 hover:shadow-primary-500/40 text-white font-black rounded-[1.5rem] shadow-xl shadow-primary-500/20 transition-all uppercase tracking-wider text-sm flex items-center justify-center gap-4 active:scale-[0.97] group relative overflow-hidden">
+                        <div
+                            class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                        </div>
+                        <div class="relative flex items-center gap-4">
+                            <i class="fas fa-shield-alt text-xl"></i>
+                            <span class="text-left md:text-center leading-tight uppercase tracking-wider">Proses Pembayaran<br class="block sm:hidden"></span>
+                        </div>
                     </button>
-                    <p class="text-center text-[10px] text-secondary-400 mt-4 uppercase tracking-widest font-bold">
-                        Enkripsi 256-bit Secure Socket Layer</p>
+                    <div class="flex items-center justify-center gap-2 mt-5 text-secondary-400 drop-shadow-sm">
+                        <i class="fas fa-lock text-[9px]"></i>
+                        <p class="text-[9px] font-black uppercase tracking-[0.2em] leading-none">
+                            Secure 256-bit SSL Encryption
+                        </p>
+                    </div>
                 </div>
             </form>
 
@@ -234,7 +242,7 @@ $bank_atas_nama = $settings['rek_bank_atas_nama'] ?? 'a.n. Kas RT 06/08';
                         const currentOrderId = '<?= $order_id ?? "" ?>';
 
                         function updatePaymentStatus(orderId, status, callback) {
-                            fetch('<?= (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] ?>/update_payment_status.php', {
+                            fetch('update_payment_status.php', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                                 body: 'order_id=' + encodeURIComponent(orderId) + '&status=' + encodeURIComponent(status)
@@ -269,7 +277,7 @@ $bank_atas_nama = $settings['rek_bank_atas_nama'] ?? 'a.n. Kas RT 06/08';
                         }
 
                         document.getElementById('pay-button').addEventListener('click', () => triggerSnapPay(snapToken));
-                        <?php if ($autoOpenSnap): ?> triggerSnapPay(snapToken); <?php endif; ?>
+                            <?php if ($autoOpenSnap): ?> triggerSnapPay(snapToken); <?php endif; ?>
                     })();
                 </script>
             <?php endif; ?>
@@ -312,7 +320,8 @@ $bank_atas_nama = $settings['rek_bank_atas_nama'] ?? 'a.n. Kas RT 06/08';
                 <div
                     class="p-6 bg-white/5 rounded-3xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer group">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="text-[10px] font-black uppercase tracking-widest text-primary-400"><?= $bank_pilihan ?></span>
+                        <span
+                            class="text-[10px] font-black uppercase tracking-widest text-primary-400"><?= $bank_pilihan ?></span>
                         <i class="far fa-copy text-sm opacity-0 group-hover:opacity-100 transition-opacity"></i>
                     </div>
                     <p class="text-2xl font-bold tracking-wider mb-1"><?= $bank_no ?></p>

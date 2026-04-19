@@ -123,19 +123,19 @@ if (isset($_GET['hapus'])) {
                 <h3 class="text-xl font-black text-secondary-900">Warga Terdaftar</h3>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="bg-secondary-50/50">
-                            <th class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest">
+            <div class="overflow-x-hidden max-h-[500px] overflow-y-auto custom-scrollbar">
+                <table class="w-full text-left border-separate border-spacing-0">
+                    <thead class="sticky top-0 z-10">
+                        <tr class="bg-secondary-50">
+                            <th class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest border-b border-secondary-100">
                                 Identitas</th>
-                            <th class="px-6 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest">
+                            <th class="px-6 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest border-b border-secondary-100">
                                 Email</th>
                             <th
-                                class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest">
+                                class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest border-b border-secondary-100">
                                 Peran Akses</th>
                             <th
-                                class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest text-right">
+                                class="px-8 py-5 text-[10px] font-black text-secondary-400 uppercase tracking-widest border-b border-secondary-100 text-right">
                                 Aksi</th>
                         </tr>
                     </thead>
