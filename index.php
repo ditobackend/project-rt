@@ -43,26 +43,25 @@
                 </div>
             </div>
 
-            <!-- Akses Admin -->
+            <!-- Akses Pengurus (Admin & Ketua RT) -->
             <div
-                class="group bg-secondary-900 p-10 rounded-[3rem] shadow-2xl shadow-secondary-900/10 hover:shadow-indigo-500/20 transition-all duration-500 relative overflow-hidden text-white">
+                class="group bg-white p-10 rounded-[3rem] shadow-sm border border-secondary-100 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 relative overflow-hidden">
                 <div
-                    class="absolute -left-8 -bottom-8 w-32 h-32 bg-white/5 rounded-full group-hover:scale-150 transition-transform duration-700">
+                    class="absolute -left-8 -bottom-8 w-32 h-32 bg-indigo-500/10 rounded-full group-hover:scale-150 transition-transform duration-700">
                 </div>
 
                 <div class="relative z-10 text-center">
                     <div
-                        class="w-16 h-16 bg-white/10 text-indigo-400 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-500">
+                        class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500">
                         <i class="fas fa-user-shield text-2xl"></i>
                     </div>
-                    <h3 class="text-2xl font-black mb-4">Dashboard Admin</h3>
-                    <p class="text-secondary-400 mb-10 leading-relaxed font-medium">
-                        Kelola database warga, validasi iuran, atur agenda kegiatan, dan respon pengaduan secara
-                        real-time.
+                    <h3 class="text-2xl font-black text-secondary-900 mb-4">Dashboard Pengurus</h3>
+                    <p class="text-secondary-500 mb-10 leading-relaxed font-medium">
+                        Kelola warga, keuangan, dan kegiatan RT secara terpadu melalui portal pengurus.
                     </p>
                     <a href="loginadmin.php"
-                        class="inline-flex items-center justify-center w-full py-5 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-500/30 uppercase tracking-widest text-sm active:scale-95">
-                        Masuk Sebagai Admin
+                        class="inline-flex items-center justify-center w-full py-5 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-500/20 uppercase tracking-widest text-sm active:scale-95">
+                        Masuk Sebagai Pengurus
                         <i class="fas fa-lock ml-3 text-xs"></i>
                     </a>
                 </div>

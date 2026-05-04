@@ -8,8 +8,8 @@ if (session_status() === PHP_SESSION_NONE) {
 // Koneksi database
 include __DIR__ . '/config/database.php';
 
-// Proteksi halaman admin
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+// Proteksi halaman ketua rt
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ketua_rt') {
     header("Location: loginadmin.php");
     exit;
 }
@@ -30,9 +30,9 @@ $page = $_GET['page'] ?? 'dashboard';
                 <div class="p-6 pb-2">
                     <div class="flex items-center space-x-3 mb-6">
                         <div class="bg-primary-500 p-2 rounded-xl shadow-lg shadow-primary-500/30">
-                            <i class="fas fa-user-shield text-xl"></i>
+                            <i class="fas fa-user-tie text-xl"></i>
                         </div>
-                        <span class="text-xl font-bold tracking-tight">Portal Admin</span>
+                        <span class="text-xl font-bold tracking-tight">Portal Ketua RT</span>
                     </div>
                 </div>
 
@@ -43,30 +43,15 @@ $page = $_GET['page'] ?? 'dashboard';
                             <i class="fas fa-tachometer-alt w-6"></i>
                             <span class="font-medium">Dashboard Utama</span>
                         </a>
-                        <a href="?page=kegiatan"
-                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
-                            <i class="fas fa-calendar-alt w-6"></i>
-                            <span class="font-medium">Data Kegiatan</span>
+                        <a href="?page=kegiatan_approval"
+                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'kegiatan_approval' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
+                            <i class="fas fa-tasks w-6"></i>
+                            <span class="font-medium">Pengajuan Kegiatan</span>
                         </a>
-                        <a href="?page=keuangan"
-                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'keuangan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
-                            <i class="fas fa-chart-line w-6"></i>
-                            <span class="font-medium">Data Keuangan</span>
-                        </a>
-                        <a href="?page=pengaduan"
-                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pengaduan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
-                            <i class="fas fa-comment-dots w-6"></i>
-                            <span class="font-medium">Pengaduan Warga</span>
-                        </a>
-                        <a href="?page=registrasi"
-                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'registrasi' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
-                            <i class="fas fa-user-plus w-6"></i>
-                            <span class="font-medium">Registrasi Warga</span>
-                        </a>
-                        <a href="?page=pengaturan"
-                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pengaturan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
-                            <i class="fas fa-cog w-6"></i>
-                            <span class="font-medium">Pengaturan Sistem</span>
+                        <a href="?page=laporan"
+                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'laporan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
+                            <i class="fas fa-file-invoice-dollar w-6"></i>
+                            <span class="font-medium">Laporan Keuangan</span>
                         </a>
                     </nav>
                 </div>
@@ -89,12 +74,12 @@ $page = $_GET['page'] ?? 'dashboard';
                     <button id="menuBtn" class="text-secondary-600 text-2xl">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <span class="ml-4 font-bold text-lg">Portal Admin</span>
+                    <span class="ml-4 font-bold text-lg">Ketua RT</span>
                 </div>
 
                 <div class="hidden md:block">
-                    <h2 class="text-secondary-500 text-sm font-medium">Selamat datang kembali,</h2>
-                    <p class="text-secondary-900 font-bold block"><?= $_SESSION['user_nama'] ?? 'Admin RT 06' ?></p>
+                    <h2 class="text-secondary-500 text-sm font-medium">Selamat datang, Pak RT</h2>
+                    <p class="text-secondary-900 font-bold block"><?= $_SESSION['user_nama'] ?? 'Ketua RT 06' ?></p>
                 </div>
 
                 <div class="flex items-center space-x-4">
@@ -105,11 +90,11 @@ $page = $_GET['page'] ?? 'dashboard';
                         $date_str = strtr(date('l, d F Y'), array_merge($hari, $bulan));
                         ?>
                         <p class="text-xs text-secondary-500"><?= $date_str ?></p>
-                        <p class="text-xs font-bold text-primary-600">RT 06/08 Serua Indah</p>
+                        <p class="text-xs font-bold text-primary-600">Otoritas Ketua RT 06/08</p>
                     </div>
                     <div
                         class="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold shadow-sm ring-2 ring-white">
-                        <?= strtoupper(substr($_SESSION['user_nama'] ?? 'A', 0, 1)) . strtoupper(substr(explode(' ', $_SESSION['user_nama'] ?? 'Admin')[1] ?? 'D', 0, 1)) ?>
+                        <?= strtoupper(substr($_SESSION['user_nama'] ?? 'K', 0, 1)) . strtoupper(substr(explode(' ', $_SESSION['user_nama'] ?? 'RT')[1] ?? 'T', 0, 1)) ?>
                     </div>
                 </div>
             </header>
@@ -118,17 +103,28 @@ $page = $_GET['page'] ?? 'dashboard';
             <main class="flex-1 overflow-y-auto p-8 scroll-smooth">
                 <div class="max-w-6xl mx-auto">
                     <?php
-                    $file = __DIR__ . "/pages/admin/{$page}.php";
-                    if (file_exists($file)) {
-                        include $file;
+                    // Map pages for Ketua RT
+                    $allowed_pages = ['dashboard', 'kegiatan_approval', 'laporan'];
+                    if (in_array($page, $allowed_pages)) {
+                        if ($page === 'dashboard') {
+                            $file = __DIR__ . "/pages/ketua/dashboard.php";
+                        } else {
+                            $file = __DIR__ . "/pages/ketua/{$page}.php";
+                        }
+                        
+                        if (file_exists($file)) {
+                            include $file;
+                        } else {
+                            // Fallback to shared pages if applicable
+                            $shared_file = __DIR__ . "/pages/admin/{$page}.php";
+                            if (file_exists($shared_file)) {
+                                include $shared_file;
+                            } else {
+                                echo "Halaman tidak ditemukan.";
+                            }
+                        }
                     } else {
-                        echo "
-                        <div class='flex flex-col items-center justify-center min-h-[60vh]'>
-                            <i class='fas fa-exclamation-triangle text-6xl text-yellow-500 mb-4'></i>
-                            <h2 class='text-2xl font-bold text-secondary-900'>Halaman Tidak Ditemukan</h2>
-                            <p class='text-secondary-500'>Maaf, halaman yang Anda cari tidak tersedia dalam sistem.</p>
-                            <a href='?page=dashboard' class='mt-6 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all'>Kembali ke Dashboard</a>
-                        </div>";
+                        echo "Akses ditolak.";
                     }
                     ?>
                 </div>
@@ -146,9 +142,9 @@ $page = $_GET['page'] ?? 'dashboard';
             <div class="flex justify-between items-center mb-10">
                 <div class="flex items-center space-x-3">
                     <div class="bg-primary-500 p-2 rounded-xl shadow-lg">
-                        <i class="fas fa-user-shield text-xl"></i>
+                        <i class="fas fa-user-tie text-xl"></i>
                     </div>
-                    <span class="text-xl font-bold tracking-tight">Portal Admin</span>
+                    <span class="text-xl font-bold tracking-tight">Ketua RT</span>
                 </div>
                 <button id="closeBtn" class="text-secondary-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
@@ -158,21 +154,13 @@ $page = $_GET['page'] ?? 'dashboard';
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'dashboard' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-tachometer-alt w-6"></i><span>Dashboard Utama</span>
                 </a>
-                <a href="?page=kegiatan"
-                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
-                    <i class="fas fa-calendar-alt w-6"></i><span>Data Kegiatan</span>
+                <a href="?page=kegiatan_approval"
+                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'kegiatan_approval' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
+                    <i class="fas fa-tasks w-6"></i><span>Pengajuan Kegiatan</span>
                 </a>
-                <a href="?page=keuangan"
-                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'keuangan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
-                    <i class="fas fa-chart-line w-6"></i><span>Data Keuangan</span>
-                </a>
-                <a href="?page=pengaduan"
-                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pengaduan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
-                    <i class="fas fa-comment-dots w-6"></i><span>Pengaduan Warga</span>
-                </a>
-                <a href="?page=registrasi"
-                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'registrasi' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
-                    <i class="fas fa-user-plus w-6"></i><span>Registrasi Warga</span>
+                <a href="?page=laporan"
+                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'laporan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
+                    <i class="fas fa-file-invoice-dollar w-6"></i><span>Laporan Keuangan</span>
                 </a>
             </nav>
 
@@ -193,7 +181,7 @@ $page = $_GET['page'] ?? 'dashboard';
         function confirmLogout() {
             Swal.fire({
                 title: 'Keluar Sistem?',
-                text: "Apakah Anda yakin ingin mengakhiri sesi admin saat ini?",
+                text: "Apakah Anda yakin ingin mengakhiri sesi ketua RT saat ini?",
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#4f46e5',
@@ -213,7 +201,6 @@ $page = $_GET['page'] ?? 'dashboard';
             })
         }
 
-        // Sidebar Mobile Interaction
         const menuBtn = document.getElementById("menuBtn");
         const closeBtn = document.getElementById("closeBtn");
         const sidebar = document.getElementById("sidebar");
@@ -240,22 +227,6 @@ $page = $_GET['page'] ?? 'dashboard';
             overlay.classList.remove("opacity-100");
             setTimeout(() => overlay.classList.add("hidden"), 300);
         }
-
-        // Handle sidebar link clicks for mobile animation
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                if (window.innerWidth < 768 && !sidebar.classList.contains('-translate-x-full')) {
-                    e.preventDefault();
-                    const targetHref = this.getAttribute('href');
-                    closeModal();
-                    setTimeout(() => {
-                        window.location.href = targetHref;
-                    }, 300);
-                }
-            });
-        });
-
-        // Active link highlight is already handled by PHP
     </script>
 
     <?php include 'includes/footer.php'; ?>

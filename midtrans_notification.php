@@ -75,6 +75,12 @@ if ($result->num_rows > 0) {
             $keuangan_stmt->bind_param("sd", $keterangan, $jumlah);
             $keuangan_stmt->execute();
             $keuangan_stmt->close();
+
+            // Simpan ke Riwayat Laporan (Consolidated)
+            $stmt_l = $conn->prepare("INSERT INTO laporan (tanggal, keterangan, jenis, jumlah, sumber_id) VALUES (CURDATE(), ?, 'pemasukan', ?, ?)");
+            $stmt_l->bind_param("sdi", $keterangan, $jumlah, $pembayaran_id);
+            $stmt_l->execute();
+            $stmt_l->close();
         }
 
         $cek_keuangan->close();

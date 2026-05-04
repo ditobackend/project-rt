@@ -4,25 +4,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 require_once __DIR__ . '/../../config/database.php';
 
-// Tambah kegiatan
-if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin') {
-    if (isset($_POST['tambah'])) {
-        $judul = $_POST['judul'];
-        $deskripsi = $_POST['deskripsi'];
-        $tanggal = $_POST['tanggal'];
-        $jam_mulai = $_POST['jam_mulai'];
-        $jam_selesai = $_POST['jam_selesai'];
-        $penyelenggara = $_POST['penyelenggara'];
-        $status = $_POST['status'];
-
-        $admin_id = $_SESSION['user_id'];
-
-        $stmt = $conn->prepare("INSERT INTO kegiatan (judul, deskripsi, tanggal, jam_mulai, jam_selesai, penyelenggara, status, admin_id) VALUES (?,?,?,?,?,?,?,?)");
-        $stmt->bind_param("sssssssi", $judul, $deskripsi, $tanggal, $jam_mulai, $jam_selesai, $penyelenggara, $status, $admin_id);
-        $stmt->execute();
-
-        echo "<script>window.location.href='dashboard_admin.php?page=kegiatan';</script>";
-    }
 
     // Update kegiatan
     if (isset($_POST['update'])) {
@@ -35,8 +16,8 @@ if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin') {
         $penyelenggara = $_POST['penyelenggara'];
         $status = $_POST['status'];
 
-        $stmt = $conn->prepare("UPDATE kegiatan SET judul=?, deskripsi=?, tanggal=?, jam_mulai=?, jam_selesai=?, penyelenggara=?, status=? WHERE id=?");
-        $stmt->bind_param("sssssssi", $judul, $deskripsi, $tanggal, $jam_mulai, $jam_selesai, $penyelenggara, $status, $id);
+        $stmt = $conn->prepare("UPDATE kegiatan SET judul=?, deskripsi=?, tanggal=?, jam_mulai=?, jam_selesai=?, status=? WHERE id=?");
+        $stmt->bind_param("ssssssi", $judul, $deskripsi, $tanggal, $jam_mulai, $jam_selesai, $status, $id);
         $stmt->execute();
 
         echo "<script>window.location.href='dashboard_admin.php?page=kegiatan';</script>";
@@ -51,7 +32,6 @@ if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin') {
 
         echo "<script>window.location.href='dashboard_admin.php?page=kegiatan';</script>";
     }
-}
 
 $where = [];
 $params = [];
@@ -91,11 +71,11 @@ if (empty($statusFilter) && empty($bulanTahunFilter)) {
 } else {
     if (!empty($statusFilter)) {
         if ($statusFilter == 'akan_datang') {
-            $where[] = "NOW() < CONCAT(tanggal, ' ', jam_mulai)";
+            $where[] = "NOW() < CONCAT(tanggal, ' ', COALESCE(jam_mulai, '00:00:00'))";
         } elseif ($statusFilter == 'berlangsung') {
-            $where[] = "NOW() >= CONCAT(tanggal, ' ', jam_mulai) AND NOW() <= CONCAT(tanggal, ' ', jam_selesai)";
+            $where[] = "NOW() >= CONCAT(tanggal, ' ', COALESCE(jam_mulai, '00:00:00')) AND NOW() <= CONCAT(tanggal, ' ', COALESCE(jam_selesai, '23:59:59'))";
         } elseif ($statusFilter == 'selesai') {
-            $where[] = "CONCAT(tanggal, ' ', jam_selesai) < NOW()";
+            $where[] = "CONCAT(tanggal, ' ', COALESCE(jam_selesai, '23:59:59')) < NOW()";
         }
     }
 }
@@ -106,11 +86,14 @@ if (!empty($bulanTahunFilter)) {
     $types .= "s";
 }
 
-$sql = "SELECT k.*, u.nama as nama_admin FROM kegiatan k LEFT JOIN users u ON k.admin_id = u.id";
+// Admin hanya melihat yang sudah disetujui atau kegiatan internal RT
+$where[] = "(status_persetujuan = 'disetujui' OR diajukan_oleh IS NULL)";
+
+$sql = "SELECT k.*, u.nama as pengusul FROM kegiatan k LEFT JOIN users u ON k.diajukan_oleh = u.id";
 if ($where) {
     $sql .= " WHERE " . implode(" AND ", $where);
 }
-$sql .= " ORDER BY tanggal DESC, jam_mulai ASC";
+$sql .= " ORDER BY tanggal DESC, COALESCE(jam_mulai, '00:00:00') ASC";
 
 $stmt = $conn->prepare($sql);
 if ($params) {
@@ -127,12 +110,6 @@ $result = $stmt->get_result();
         <p class="text-secondary-500 mt-1">Atur dan pantau aktivitas warga RT. 06</p>
     </div>
 
-    <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin'): ?>
-        <button id="btnTambah"
-            class="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-primary-500/20 transition-all active:scale-95 text-sm uppercase tracking-widest">
-            <i class="fas fa-plus"></i> Kegiatan Baru
-        </button>
-    <?php endif; ?>
 </div>
 
 <!-- Advanced Search & Filter -->
@@ -189,10 +166,9 @@ $result = $stmt->get_result();
             <div class="flex flex-wrap gap-2">
                 <?php
                 $statuses = [
-                    '' => ['label' => 'Aktif', 'icon' => 'fa-bolt'],
                     'akan_datang' => ['label' => 'Mendatang', 'icon' => 'fa-clock'],
                     'berlangsung' => ['label' => 'Berlangsung', 'icon' => 'fa-play-circle'],
-                    'selesai' => ['label' => 'Selesai (Arsip)', 'icon' => 'fa-check-circle']
+                    'selesai' => ['label' => 'Selesai', 'icon' => 'fa-check-circle']
                 ];
                 foreach ($statuses as $val => $data):
                     $active = ($statusFilter == $val);
@@ -247,9 +223,9 @@ $result = $stmt->get_result();
                                         <p class="text-xs text-secondary-400 line-clamp-1 max-w-[200px]">
                                             <?= htmlspecialchars($row['deskripsi']) ?>
                                         </p>
-                                        <?php if (!empty($row['nama_admin'])): ?>
+                                        <?php if (!empty($row['pengusul'])): ?>
                                             <p class="text-[9px] font-black text-primary-500 uppercase tracking-widest mt-2">
-                                                <i class="fas fa-user-edit mr-1"></i> <?= htmlspecialchars($row['nama_admin']) ?>
+                                                <i class="fas fa-user-edit mr-1"></i> Diajukan Oleh: <?= htmlspecialchars($row['pengusul']) ?>
                                             </p>
                                         <?php endif; ?>
                                     </div>
@@ -274,14 +250,14 @@ $result = $stmt->get_result();
                                 <?php
                                 date_default_timezone_set('Asia/Jakarta');
                                 $now = time();
-                                $start_time = strtotime($row['tanggal'] . ' ' . $row['jam_mulai']);
-                                $end_time = strtotime($row['tanggal'] . ' ' . $row['jam_selesai']);
+                                $start_time = strtotime($row['tanggal'] . ' ' . ($row['jam_mulai'] ?? '00:00:00'));
+                                $end_time = strtotime($row['tanggal'] . ' ' . ($row['jam_selesai'] ?? '23:59:59'));
 
                                 $isLive = ($now >= $start_time && $now <= $end_time);
                                 $isFinished = ($now > $end_time);
 
                                 $color = $isLive ? "green" : ($isFinished ? "secondary" : "blue");
-                                $label = $isLive ? "Berlangsung" : ($isFinished ? "Selesai" : "Terjadwal");
+                                $label = $isLive ? "Berlangsung" : ($isFinished ? "Selesai" : "Mendatang");
                                 ?>
                                 <span
                                     class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-<?= $color ?>-100 text-<?= $color ?>-600 ring-4 ring-<?= $color ?>-50">
@@ -299,7 +275,6 @@ $result = $stmt->get_result();
                                             data-deskripsi="<?= htmlspecialchars($row['deskripsi']) ?>"
                                             data-tanggal="<?= $row['tanggal'] ?>" data-jam_mulai="<?= $row['jam_mulai'] ?>"
                                             data-jam_selesai="<?= $row['jam_selesai'] ?>"
-                                            data-penyelenggara="<?= htmlspecialchars($row['penyelenggara']) ?>"
                                             data-status="<?= $row['status'] ?>">
                                             <i class="fas fa-edit text-lg"></i>
                                         </button>
@@ -386,12 +361,6 @@ $result = $stmt->get_result();
                 </div>
             </div>
 
-            <div>
-                <label
-                    class="block text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] mb-2 ml-1">Penyelenggara</label>
-                <input type="text" name="penyelenggara" id="editPenyelenggara" placeholder="Siapa yang mengadakan?"
-                    class="w-full px-5 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-[1.25rem] text-secondary-900 font-medium transition-all">
-            </div>
 
             <div class="pt-4">
                 <button type="submit" name="tambah" id="submitBtn"
@@ -423,7 +392,6 @@ $result = $stmt->get_result();
             document.getElementById('editTanggal').value = data.tanggal;
             document.getElementById('editJamMulai').value = data.jam_mulai;
             document.getElementById('editJamSelesai').value = data.jam_selesai;
-            document.getElementById('editPenyelenggara').value = data.penyelenggara;
         } else {
             modalTitle.innerText = "Tambah Kegiatan Baru";
             submitBtn.innerText = "Publikasikan Kegiatan";

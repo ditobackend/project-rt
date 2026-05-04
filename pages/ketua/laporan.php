@@ -50,7 +50,7 @@ $laporan = $stmt_laporan->get_result();
 
 <!-- Filter Bar -->
 <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-secondary-100 mb-8">
-    <form method="GET" action="dashboard_admin.php" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+    <form method="GET" action="dashboard_ketua.php" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
         <input type="hidden" name="page" value="laporan">
 
         <div class="md:col-span-2">

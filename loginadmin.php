@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? AND role = 'admin'");
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? AND role IN ('admin', 'ketua_rt')");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -17,15 +17,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($password === $user['password']) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_nama'] = $user['nama'];
-            $_SESSION['role'] = 'admin';
+            $_SESSION['role'] = $user['role'];
 
-            header("Location: dashboard_admin.php");
+            if ($user['role'] === 'admin') {
+                header("Location: dashboard_admin.php");
+            } else if ($user['role'] === 'ketua_rt') {
+                header("Location: dashboard_ketua.php");
+            }
             exit;
         } else {
-            $error = "Kata sandi administrator salah.";
+            $error = "Kata sandi salah.";
         }
     } else {
-        $error = "Email tidak memiliki hak akses admin.";
+        $error = "Email tidak memiliki hak akses pengurus.";
     }
 }
 ?>
@@ -79,8 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 class="inline-flex items-center justify-center w-16 h-16 bg-secondary-900 rounded-3xl shadow-xl mb-4 hover:scale-105 transition-transform border border-white/20">
                 <i class="fas fa-user-shield text-primary-500 text-2xl"></i>
             </a>
-            <h1 class="text-2xl font-black text-secondary-900 tracking-tight">Portal Admin</h1>
-            <p class="text-secondary-500 font-medium">Otoritas Pengurus RT 06/08</p>
+            <h1 class="text-2xl font-black text-secondary-900 tracking-tight">Portal Pengurus</h1>
+            <p class="text-secondary-500 font-medium">Otoritas Ketua RT & Admin 06/08</p>
         </div>
 
         <!-- Login Card -->

@@ -14,7 +14,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tambah_pengeluaran'])
     
     $stmt = $conn->prepare("INSERT INTO keuangan (tanggal, keterangan, jenis, jumlah, admin_id) VALUES (?, ?, 'pengeluaran', ?, ?)");
     $stmt->bind_param("ssdi", $tanggal, $keterangan, $jumlah, $admin_id);
+    
     if($stmt->execute()) {
+        $keuangan_id = $conn->insert_id;
+        
+        // Simpan ke Riwayat Pengeluaran
+        $stmt_p = $conn->prepare("INSERT INTO pengeluaran (tanggal, keterangan, jumlah, kategori, admin_id) VALUES (?, ?, ?, ?, ?)");
+        $stmt_p->bind_param("ssdsi", $tanggal, $keterangan, $jumlah, $jenis_pengeluaran, $admin_id);
+        $stmt_p->execute();
+        $pengeluaran_id = $conn->insert_id;
+        $stmt_p->close();
+        
+        // Simpan ke Riwayat Laporan (Consolidated)
+        // Gunakan query yang lebih aman jika tabel belum sinkron
+        $check_table = $conn->query("SHOW COLUMNS FROM laporan LIKE 'sumber_id'");
+        if ($check_table && $check_table->num_rows > 0) {
+            $stmt_l = $conn->prepare("INSERT INTO laporan (tanggal, keterangan, jenis, jumlah, sumber_id, admin_id) VALUES (?, ?, 'pengeluaran', ?, ?, ?)");
+            $stmt_l->bind_param("ssdii", $tanggal, $keterangan, $jumlah, $pengeluaran_id, $admin_id);
+            $stmt_l->execute();
+            $stmt_l->close();
+        } else {
+            // Fallback jika sumber_id belum ada (agar tidak fatal error)
+            $stmt_l = $conn->prepare("INSERT INTO laporan (tanggal, keterangan, jenis, jumlah, admin_id) VALUES (?, ?, 'pengeluaran', ?, ?)");
+            $stmt_l->bind_param("ssdi", $tanggal, $keterangan, $jumlah, $admin_id);
+            $stmt_l->execute();
+            $stmt_l->close();
+        }
+
         echo "<script>
             document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
@@ -73,6 +99,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_keuangan'])) {
 // Hapus Keuangan
 if (isset($_GET['hapus'])) {
     $id = $_GET['hapus'];
+    
+    // 1. Ambil detail transaksi sebelum dihapus untuk mencocokkan di tabel riwayat
+    $stmt_get = $conn->prepare("SELECT * FROM keuangan WHERE id = ?");
+    $stmt_get->bind_param("i", $id);
+    $stmt_get->execute();
+    $res = $stmt_get->get_result();
+    
+    if ($row = $res->fetch_assoc()) {
+        $tanggal = $row['tanggal'];
+        $keterangan = $row['keterangan'];
+        $jumlah = $row['jumlah'];
+        $jenis = $row['jenis'];
+
+        // 2. Hapus dari tabel laporan (riwayat konsolidasi)
+        $stmt_l = $conn->prepare("DELETE FROM laporan WHERE tanggal = ? AND keterangan = ? AND jumlah = ? AND jenis = ?");
+        $stmt_l->bind_param("ssds", $tanggal, $keterangan, $jumlah, $jenis);
+        $stmt_l->execute();
+        $stmt_l->close();
+
+        // 3. Jika jenisnya pengeluaran, hapus juga dari tabel pengeluaran khusus
+        if ($jenis == 'pengeluaran') {
+            $stmt_p = $conn->prepare("DELETE FROM pengeluaran WHERE tanggal = ? AND keterangan = ? AND jumlah = ?");
+            $stmt_p->bind_param("ssd", $tanggal, $keterangan, $jumlah);
+            $stmt_p->execute();
+            $stmt_p->close();
+        }
+    }
+    $stmt_get->close();
+
+    // 4. Hapus dari tabel utama keuangan
     $stmt = $conn->prepare("DELETE FROM keuangan WHERE id=?");
     $stmt->bind_param("i", $id);
     if($stmt->execute()) {

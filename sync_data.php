@@ -33,6 +33,12 @@ if ($res && $res->num_rows > 0) {
             $ins->bind_param("ssd", $tanggal, $keterangan, $jumlah);
             
             if ($ins->execute()) {
+                // Simpan ke Riwayat Laporan (Consolidated)
+                $stmt_l = $conn->prepare("INSERT INTO laporan (tanggal, keterangan, jenis, jumlah, sumber_id) VALUES (?, ?, 'pemasukan', ?, ?)");
+                $stmt_l->bind_param("ssdi", $tanggal, $keterangan, $jumlah, $row['id']);
+                $stmt_l->execute();
+                $stmt_l->close();
+
                 echo "DISINKRON: Transaksi {$row['order_id']} ($keterangan) senilai $jumlah berhasil dimasukkan.\n";
                 $count++;
             } else {
