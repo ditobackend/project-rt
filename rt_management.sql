@@ -223,35 +223,6 @@ INSERT INTO `pengaturan` (`id`, `kunci`, `nilai`, `kategori`, `keterangan`) VALU
 (14, 'rek_bank_nomor', '123 456 7890', 'rekening', 'Nomor Rekening'),
 (15, 'rek_bank_atas_nama', 'Kitabulloh', 'rekening', 'Nama Pemilik Rekening');
 
--- --------------------------------------------------------
-
---
--- Table structure for table `pengeluaran`
---
-
-CREATE TABLE `pengeluaran` (
-  `id` int NOT NULL,
-  `tanggal` date NOT NULL,
-  `keterangan` varchar(255) NOT NULL,
-  `jumlah` decimal(15,2) NOT NULL,
-  `kategori` varchar(100) DEFAULT NULL,
-  `admin_id` int DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `pengeluaran`
---
-
-INSERT INTO `pengeluaran` (`id`, `tanggal`, `keterangan`, `jumlah`, `kategori`, `admin_id`, `created_at`) VALUES
-(1, '2026-04-06', 'Admin - Operasional - beli sapu', '9.00', 'Operasional', NULL, '2026-04-06 13:33:55'),
-(2, '2026-04-19', 'Admin - Kegiatan Sosial - donasi panti', '10.00', 'Kegiatan Sosial', 1, '2026-04-19 13:47:36'),
-(3, '2026-05-04', 'Admin - Lainnya - beli gorengan', '18.00', 'Lainnya', 1, '2026-05-04 09:18:20'),
-(4, '2026-05-04', 'Admin - Lainnya - beli minum', '5.00', 'Lainnya', 1, '2026-05-04 12:47:11'),
-(5, '2026-05-04', 'Admin - Lainnya - beli minum', '5.00', 'Lainnya', 1, '2026-05-04 12:51:03'),
-(6, '2026-05-04', 'Admin - Lainnya - beli minum', '5.00', 'Lainnya', 1, '2026-05-04 12:52:43');
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `users`
@@ -322,13 +293,6 @@ ALTER TABLE `pengaduan`
 ALTER TABLE `pengaturan`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `kunci` (`kunci`);
-
---
--- Indexes for table `pengeluaran`
---
-ALTER TABLE `pengeluaran`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `admin_id` (`admin_id`);
 
 --
 -- Indexes for table `users`
@@ -423,11 +387,6 @@ ALTER TABLE `pembayaran`
 ALTER TABLE `pengaduan`
   ADD CONSTRAINT `pengaduan_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
---
--- Constraints for table `pengeluaran`
---
-ALTER TABLE `pengeluaran`
-  ADD CONSTRAINT `pengeluaran_ibfk_1` FOREIGN KEY (`admin_id`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

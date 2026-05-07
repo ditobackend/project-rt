@@ -23,25 +23,10 @@ if ($check_laporan && $check_laporan->num_rows > 0) {
     }
 }
 
-// 2. Create pengeluaran table
-$sql_pengeluaran = "CREATE TABLE IF NOT EXISTS pengeluaran (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    tanggal DATE NOT NULL,
-    keterangan VARCHAR(255) NOT NULL,
-    jumlah DECIMAL(15,2) NOT NULL,
-    kategori VARCHAR(100),
-    admin_id INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (admin_id) REFERENCES users(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+// Catatan: Tabel pengeluaran telah dihapus.
+// Data pengeluaran kini dikelola sepenuhnya melalui tabel keuangan.
 
-if ($conn->query($sql_pengeluaran)) {
-    echo "Tabel 'pengeluaran' siap.<br>";
-} else {
-    echo "Gagal membuat tabel 'pengeluaran': " . $conn->error . "<br>";
-}
-
-// 3. Create laporan table (riwayat transaksi)
+// 2. Create laporan table (riwayat transaksi)
 $sql_laporan = "CREATE TABLE IF NOT EXISTS laporan (
     id INT AUTO_INCREMENT PRIMARY KEY,
     tanggal DATE NOT NULL,
@@ -68,5 +53,6 @@ if ($check_keuangan && $check_keuangan->num_rows == 0) {
     $conn->query("ALTER TABLE keuangan ADD FOREIGN KEY (admin_id) REFERENCES users(id)");
 }
 
-echo "<strong>Setup selesai! Silakan lanjut jalankan migrate_history.php</strong>";
+echo "<strong>Setup selesai!</strong>";
+
 ?>

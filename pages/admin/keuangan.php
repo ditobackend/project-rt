@@ -18,23 +18,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tambah_pengeluaran'])
     if($stmt->execute()) {
         $keuangan_id = $conn->insert_id;
         
-        // Simpan ke Riwayat Pengeluaran
-        $stmt_p = $conn->prepare("INSERT INTO pengeluaran (tanggal, keterangan, jumlah, kategori, admin_id) VALUES (?, ?, ?, ?, ?)");
-        $stmt_p->bind_param("ssdsi", $tanggal, $keterangan, $jumlah, $jenis_pengeluaran, $admin_id);
-        $stmt_p->execute();
-        $pengeluaran_id = $conn->insert_id;
-        $stmt_p->close();
-        
         // Simpan ke Riwayat Laporan (Consolidated)
-        // Gunakan query yang lebih aman jika tabel belum sinkron
+        // sumber_id diisi dengan id dari tabel keuangan
         $check_table = $conn->query("SHOW COLUMNS FROM laporan LIKE 'sumber_id'");
         if ($check_table && $check_table->num_rows > 0) {
             $stmt_l = $conn->prepare("INSERT INTO laporan (tanggal, keterangan, jenis, jumlah, sumber_id, admin_id) VALUES (?, ?, 'pengeluaran', ?, ?, ?)");
-            $stmt_l->bind_param("ssdii", $tanggal, $keterangan, $jumlah, $pengeluaran_id, $admin_id);
+            $stmt_l->bind_param("ssdii", $tanggal, $keterangan, $jumlah, $keuangan_id, $admin_id);
             $stmt_l->execute();
             $stmt_l->close();
         } else {
-            // Fallback jika sumber_id belum ada (agar tidak fatal error)
+            // Fallback jika sumber_id belum ada
             $stmt_l = $conn->prepare("INSERT INTO laporan (tanggal, keterangan, jenis, jumlah, admin_id) VALUES (?, ?, 'pengeluaran', ?, ?)");
             $stmt_l->bind_param("ssdi", $tanggal, $keterangan, $jumlah, $admin_id);
             $stmt_l->execute();
@@ -117,14 +110,6 @@ if (isset($_GET['hapus'])) {
         $stmt_l->bind_param("ssds", $tanggal, $keterangan, $jumlah, $jenis);
         $stmt_l->execute();
         $stmt_l->close();
-
-        // 3. Jika jenisnya pengeluaran, hapus juga dari tabel pengeluaran khusus
-        if ($jenis == 'pengeluaran') {
-            $stmt_p = $conn->prepare("DELETE FROM pengeluaran WHERE tanggal = ? AND keterangan = ? AND jumlah = ?");
-            $stmt_p->bind_param("ssd", $tanggal, $keterangan, $jumlah);
-            $stmt_p->execute();
-            $stmt_p->close();
-        }
     }
     $stmt_get->close();
 
