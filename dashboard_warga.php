@@ -5,6 +5,15 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'warga') {
     exit;
 }
 $page = $_GET['page'] ?? 'dashboard';
+
+// Hitung laporan aktif warga (Diterima/Diproses) untuk badge
+$badge_pengaduan = 0;
+if (isset($_SESSION['user_id'])) {
+    require_once 'config/database.php';
+    $uid = (int)$_SESSION['user_id'];
+    $bRes = $conn->query("SELECT COUNT(*) as c FROM pengaduan WHERE user_id=$uid AND status IN ('Diterima','Diproses')");
+    if ($bRes) $badge_pengaduan = (int)$bRes->fetch_assoc()['c'];
+}
 ?>
 
 <?php include 'includes/header.php'; ?>
@@ -42,7 +51,12 @@ $page = $_GET['page'] ?? 'dashboard';
                     <a href="?page=pengaduan"
                         class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pengaduan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
                         <i class="fas fa-comment-dots w-6"></i>
-                        <span class="font-medium">Layanan Pengaduan</span>
+                        <span class="font-medium flex-1">Layanan Pengaduan</span>
+                        <?php if ($badge_pengaduan > 0): ?>
+                        <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-black rounded-full shadow-sm animate-pulse">
+                            <?= $badge_pengaduan ?>
+                        </span>
+                        <?php endif; ?>
                     </a>
                     <a href="?page=pembayaran"
                         class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pembayaran' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
@@ -149,7 +163,13 @@ $page = $_GET['page'] ?? 'dashboard';
                 </a>
                 <a href="?page=pengaduan"
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pengaduan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
-                    <i class="fas fa-comment-dots w-6"></i><span>Layanan Pengaduan</span>
+                    <i class="fas fa-comment-dots w-6"></i>
+                    <span class="flex-1">Layanan Pengaduan</span>
+                    <?php if ($badge_pengaduan > 0): ?>
+                    <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-black rounded-full shadow-sm">
+                        <?= $badge_pengaduan ?>
+                    </span>
+                    <?php endif; ?>
                 </a>
                 <a href="?page=pembayaran"
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pembayaran' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">

@@ -11,7 +11,8 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = (int) $_SESSION['user_id'];
 $success = '';
-$error = '';
+$error   = '';
+
 
 $has_judul = false;
 $colRes = $conn->query("SHOW COLUMNS FROM pengaduan LIKE 'judul'");
@@ -38,11 +39,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->bind_param("is", $user_id, $isi);
             }
             if ($stmt->execute()) {
+                $stmt->close();
                 $success = 'Laporan Anda telah berhasil terkirim ke pengurus RT.';
             } else {
                 $error = 'Sistem sibuk: ' . $stmt->error;
+                $stmt->close();
             }
-            $stmt->close();
         }
     }
 
@@ -62,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (!$checkRes || (int)$checkRes['user_id'] !== $user_id) {
                 $error = 'Izin ditolak.';
-            } elseif ($checkRes['status'] !== 'Diterima') {
+            } elseif (strtolower($checkRes['status']) !== 'diterima') {
                 $error = 'Laporan yang sedang diproses tidak dapat diubah.';
             } else {
                 if ($has_judul) {
@@ -70,12 +72,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt->bind_param("ssi", $judul, $isi, $id);
                 } else {
                     $stmt = $conn->prepare("UPDATE pengaduan SET isi = ? WHERE id = ?");
-                    $stmt->bind_param("si", $id);
+                    $stmt->bind_param("si", $isi, $id);
                 }
                 if ($stmt->execute()) {
+                    $stmt->close();
                     $success = 'Perubahan laporan berhasil disimpan.';
+                } else {
+                    $error = 'Gagal menyimpan: ' . $stmt->error;
+                    $stmt->close();
                 }
-                $stmt->close();
             }
         }
     }
@@ -89,12 +94,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $checkRes = $check->get_result()->fetch_assoc();
             $check->close();
 
-            if ($checkRes && (int)$checkRes['user_id'] === $user_id && $checkRes['status'] === 'Diterima') {
+            if ($checkRes && (int)$checkRes['user_id'] === $user_id && strtolower($checkRes['status']) === 'diterima') {
                 $stmt = $conn->prepare("DELETE FROM pengaduan WHERE id = ?");
                 $stmt->bind_param("i", $id);
                 $stmt->execute();
                 $stmt->close();
-                $success = 'Laporan telah dihapus.';
+                $success = 'Laporan berhasil dihapus.';
             } else {
                 $error = 'Gagal menghapus: Laporan mungkin sudah diproses admin.';
             }
@@ -107,10 +112,10 @@ $edit_id = isset($_GET['edit']) ? (int) $_GET['edit'] : 0;
 $edit_row = null;
 if ($edit_id > 0) {
     if ($has_judul) {
-        $stmt = $conn->prepare("SELECT id, judul, isi FROM pengaduan WHERE id = ? AND user_id = ? AND status='Diterima'");
+        $stmt = $conn->prepare("SELECT id, judul, isi FROM pengaduan WHERE id = ? AND user_id = ? AND status='diterima'");
         $stmt->bind_param("ii", $edit_id, $user_id);
     } else {
-        $stmt = $conn->prepare("SELECT id, isi FROM pengaduan WHERE id = ? AND user_id = ? AND status='Diterima'");
+        $stmt = $conn->prepare("SELECT id, isi FROM pengaduan WHERE id = ? AND user_id = ? AND status='diterima'");
         $stmt->bind_param("ii", $edit_id, $user_id);
     }
     $stmt->execute();
@@ -140,19 +145,7 @@ $stmt->close();
                 <?= ($edit_row) ? 'Update Laporan' : 'Laporan Baru' ?>
             </h3>
 
-            <?php if ($success): ?>
-                <div class="p-4 mb-6 bg-green-50 text-green-700 rounded-2xl border border-green-100 flex items-center gap-3 animate-in fade-in transition-all">
-                    <i class="fas fa-check-circle"></i>
-                    <p class="text-xs font-bold uppercase tracking-tight"><?= $success ?></p>
-                </div>
-            <?php endif; ?>
 
-            <?php if ($error): ?>
-                <div class="p-4 mb-6 bg-red-50 text-red-700 rounded-2xl border border-red-100 flex items-center gap-3 animate-in fade-in transition-all">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <p class="text-xs font-bold uppercase tracking-tight"><?= $error ?></p>
-                </div>
-            <?php endif; ?>
 
             <form method="POST" action="dashboard_warga.php?page=pengaduan" class="space-y-6">
                 <input type="hidden" name="action" value="<?= ($edit_row) ? 'update' : 'create' ?>">
@@ -202,17 +195,24 @@ $stmt->close();
                     </div>
                 <?php else: ?>
                     <?php while ($r = $list->fetch_assoc()): 
-                        $status = $r['status'] ?? 'Diterima';
-                        $color = "blue";
-                        if($status == 'Diproses') $color = "yellow";
-                        if($status == 'Selesai') $color = "green";
+                        $status    = strtolower($r['status'] ?? 'diterima');
+                        $color     = 'blue';
+                        $statusIcon  = 'fa-inbox';
+                        $statusLabel = 'Diterima';
+                        if ($status == 'diproses') {
+                            $color = 'amber'; $statusIcon = 'fa-spinner'; $statusLabel = 'Sedang Diproses';
+                        }
+                        if ($status == 'selesai') {
+                            $color = 'green'; $statusIcon = 'fa-check-circle'; $statusLabel = 'Selesai';
+                        }
                     ?>
                     <div class="p-8 group hover:bg-primary-50/20 transition-all">
                         <div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
                             <div class="flex-1">
                                 <div class="flex items-center gap-3 mb-3">
-                                    <span class="inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-<?= $color ?>-100 text-<?= $color ?>-600">
-                                        <?= $status ?>
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-<?= $color ?>-100 text-<?= $color ?>-600">
+                                        <i class="fas <?= $statusIcon ?> text-[9px]"></i>
+                                        <?= $statusLabel ?>
                                     </span>
                                     <span class="text-[10px] font-bold text-secondary-400 flex items-center">
                                         <i class="far fa-clock mr-1.5"></i>
@@ -226,18 +226,19 @@ $stmt->close();
                                 <p class="text-secondary-500 text-sm leading-relaxed"><?= nl2br(htmlspecialchars($r['isi'])) ?></p>
                             </div>
 
-                            <?php if ($status === 'Diterima'): ?>
-                            <div class="flex items-center gap-2 shrink-0 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                                <a href="?page=pengaduan&edit=<?= $r['id'] ?>" class="w-10 h-10 rounded-xl bg-secondary-100 text-secondary-400 flex items-center justify-center hover:bg-yellow-500 hover:text-white transition-all shadow-sm">
+                            <?php if ($status === 'diterima'): ?>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <a href="?page=pengaduan&edit=<?= $r['id'] ?>" 
+                                   class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center hover:bg-amber-500 hover:text-white transition-all shadow-sm border border-amber-100"
+                                   title="Edit Laporan">
                                     <i class="fas fa-edit text-xs"></i>
                                 </a>
-                                <form method="POST" onsubmit="return confirm('Hapus laporan ini?');">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="id" value="<?= $r['id'] ?>">
-                                    <button type="submit" class="w-10 h-10 rounded-xl bg-secondary-100 text-secondary-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm">
-                                        <i class="fas fa-trash-alt text-xs"></i>
-                                    </button>
-                                </form>
+                                <button type="button" 
+                                        onclick="confirmDelete(<?= $r['id'] ?>)"
+                                        class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm border border-red-100"
+                                        title="Hapus Laporan">
+                                    <i class="fas fa-trash-alt text-xs"></i>
+                                </button>
                             </div>
                             <?php endif; ?>
                         </div>
@@ -248,3 +249,63 @@ $stmt->close();
         </div>
     </div>
 </div>
+
+<form id="deleteForm" method="POST" action="dashboard_warga.php?page=pengaduan" style="display: none;">
+    <input type="hidden" name="action" value="delete">
+    <input type="hidden" name="id" id="deleteId">
+</form>
+
+<script>
+// Toast Notification (muncul otomatis setelah redirect)
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 2000,
+    timerProgressBar: true,
+    customClass: {
+        popup: 'rounded-2xl shadow-xl text-sm font-bold',
+    }
+});
+
+<?php if ($success): ?>
+Toast.fire({
+    icon: 'success',
+    title: '<?= addslashes($success) ?>'
+}).then(() => {
+    window.location.href = 'dashboard_warga.php?page=pengaduan';
+});
+<?php endif; ?>
+
+<?php if ($error): ?>
+Toast.fire({
+    icon: 'error',
+    title: '<?= addslashes($error) ?>'
+});
+<?php endif; ?>
+
+// Konfirmasi hapus
+function confirmDelete(id) {
+    Swal.fire({
+        title: 'Hapus Laporan?',
+        text: "Laporan yang dihapus tidak dapat dikembalikan.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal',
+        background: '#ffffff',
+        customClass: {
+            popup: 'rounded-[2rem] shadow-xl border-0',
+            confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
+            cancelButton: 'rounded-xl px-6 py-2.5 font-bold'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('deleteId').value = id;
+            document.getElementById('deleteForm').submit();
+        }
+    })
+}
+</script>

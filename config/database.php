@@ -2,7 +2,7 @@
 $host = "localhost";
 $user = "root";     
 $pass = "";       
-$db   = "rt_manajemen";
+$db   = "rt_management";
 
 $conn = new mysqli($host, $user, $pass, $db);
 

@@ -137,5 +137,29 @@ echo '  </div>
 </body>
 </html>';
 
+// 5. Sinkronisasi dengan rt_management.sql
+logMessage("Memulai sinkronisasi dengan rt_management.sql...");
+$sql_file = 'rt_management.sql';
+if (file_exists($sql_file)) {
+    $sql_content = file_get_contents($sql_file);
+    
+    // Hapus komentar dan baris kosong untuk menghindari masalah multi_query
+    // Namun multi_query biasanya bisa menangani dump phpMyAdmin
+    if ($conn->multi_query($sql_content)) {
+        $count = 0;
+        do {
+            $count++;
+            // Kosongkan hasil agar bisa lanjut ke query berikutnya
+            if ($result = $conn->store_result()) { $result->free(); }
+        } while ($conn->more_results() && $conn->next_result());
+        
+        logMessage("Sinkronisasi SQL selesai ($count batch query dieksekusi).", "success");
+    } else {
+        logMessage("Gagal mengeksekusi SQL: " . $conn->error, "error");
+    }
+} else {
+    logMessage("File $sql_file tidak ditemukan!", "error");
+}
+
 $conn->close();
 ?>
