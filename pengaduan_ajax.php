@@ -18,6 +18,7 @@ require_once __DIR__ . '/config/database.php';
 
 $ajax_action = $_POST['ajax_action'] ?? '';
 $id          = intval($_POST['id'] ?? 0);
+$tanggapan   = trim($_POST['tanggapan'] ?? '');
 
 if ($ajax_action === 'update_status' && $id > 0) {
     $row = $conn->query("SELECT status FROM pengaduan WHERE id = $id")->fetch_assoc();
@@ -36,8 +37,15 @@ if ($ajax_action === 'update_status' && $id > 0) {
     }
 
     $new_status = $next_map[$current];
-    $stmt = $conn->prepare("UPDATE pengaduan SET status = ? WHERE id = ?");
-    $stmt->bind_param("si", $new_status, $id);
+    
+    if ($new_status === 'Diproses') {
+        $stmt = $conn->prepare("UPDATE pengaduan SET status = ?, tanggapan_admin = ? WHERE id = ?");
+        $stmt->bind_param("ssi", $new_status, $tanggapan, $id);
+    } else {
+        $stmt = $conn->prepare("UPDATE pengaduan SET status = ? WHERE id = ?");
+        $stmt->bind_param("si", $new_status, $id);
+    }
+    
     $stmt->execute();
     $stmt->close();
 

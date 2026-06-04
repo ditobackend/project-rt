@@ -53,6 +53,11 @@ $page = $_GET['page'] ?? 'dashboard';
                             <i class="fas fa-file-invoice-dollar w-6"></i>
                             <span class="font-medium">Laporan Keuangan</span>
                         </a>
+                        <a href="?page=laporan_kegiatan"
+                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'laporan_kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
+                            <i class="fas fa-file-alt w-6"></i>
+                            <span class="font-medium">Laporan Kegiatan</span>
+                        </a>
                     </nav>
                 </div>
 
@@ -104,7 +109,7 @@ $page = $_GET['page'] ?? 'dashboard';
                 <div class="max-w-6xl mx-auto">
                     <?php
                     // Map pages for Ketua RT
-                    $allowed_pages = ['dashboard', 'kegiatan_approval', 'laporan'];
+                    $allowed_pages = ['dashboard', 'kegiatan_approval', 'laporan', 'laporan_kegiatan'];
                     if (in_array($page, $allowed_pages)) {
                         if ($page === 'dashboard') {
                             $file = __DIR__ . "/pages/ketua/dashboard.php";
@@ -161,6 +166,10 @@ $page = $_GET['page'] ?? 'dashboard';
                 <a href="?page=laporan"
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'laporan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-file-invoice-dollar w-6"></i><span>Laporan Keuangan</span>
+                </a>
+                <a href="?page=laporan_kegiatan"
+                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'laporan_kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
+                    <i class="fas fa-file-alt w-6"></i><span>Laporan Kegiatan</span>
                 </a>
             </nav>
 

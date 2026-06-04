@@ -191,6 +191,7 @@ CREATE TABLE `pengaduan` (
   `judul` varchar(150) DEFAULT NULL,
   `isi` text NOT NULL,
   `status` enum('diterima','diproses','selesai') DEFAULT 'diterima',
+  `tanggapan_admin` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

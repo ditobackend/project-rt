@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../config/database.php';
 
 // Ambil data pengaduan
 $sql = "
-    SELECT p.id, u.nama, p.judul, p.isi, p.status, p.created_at 
+    SELECT p.id, u.nama, p.judul, p.isi, p.status, p.created_at, p.tanggapan_admin 
     FROM pengaduan p
     JOIN users u ON p.user_id = u.id
     ORDER BY p.created_at DESC
@@ -57,7 +57,13 @@ $result = $conn->query($sql);
                         </td>
                         <td class="px-6 py-6 font-bold text-secondary-800 tracking-tight"><?= htmlspecialchars($row['judul'] ?? '-') ?></td>
                         <td class="px-6 py-6">
-                            <p class="text-sm text-secondary-500 line-clamp-2 max-w-xs"><?= htmlspecialchars($row['isi']) ?></p>
+                            <p class="text-sm text-secondary-500 max-w-xs"><?= nl2br(htmlspecialchars($row['isi'])) ?></p>
+                            <?php if(!empty($row['tanggapan_admin'])): ?>
+                            <div class="mt-3 p-3 bg-blue-50/50 rounded-xl border border-blue-100 text-xs text-blue-700 shadow-sm">
+                                <span class="font-bold block mb-1">Tanggapan Admin:</span>
+                                <?= nl2br(htmlspecialchars($row['tanggapan_admin'])) ?>
+                            </div>
+                            <?php endif; ?>
                         </td>
                         <td class="px-6 py-6">
                             <p class="text-xs font-medium text-secondary-400">
@@ -131,9 +137,8 @@ function updateStatus(id, btn) {
     const cfg = STATUS_CONFIG[currentStatus];
     if (!cfg) return;
 
-    Swal.fire({
+    let swalConfig = {
         title: cfg.label,
-        text: `Laporan akan diupdate menjadi "${cfg.next}".`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#059669',
@@ -145,7 +150,23 @@ function updateStatus(id, btn) {
             confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
             cancelButton: 'rounded-xl px-6 py-2.5 font-bold'
         }
-    }).then(result => {
+    };
+
+    if (cfg.next === 'Diproses') {
+        swalConfig.text = 'Berikan tanggapan atau tindak lanjut untuk warga:';
+        swalConfig.input = 'textarea';
+        swalConfig.inputPlaceholder = 'Tuliskan tanggapan di sini...';
+        swalConfig.inputAttributes = { 'aria-label': 'Tuliskan tanggapan di sini' };
+        swalConfig.inputValidator = (value) => {
+            if (!value) {
+                return 'Tanggapan tidak boleh kosong!';
+            }
+        };
+    } else {
+        swalConfig.text = `Laporan akan diupdate menjadi "${cfg.next}".`;
+    }
+
+    Swal.fire(swalConfig).then(result => {
         if (!result.isConfirmed) return;
 
         // Loading state
@@ -155,6 +176,9 @@ function updateStatus(id, btn) {
         const form = new FormData();
         form.append('ajax_action', 'update_status');
         form.append('id', id);
+        if (cfg.next === 'Diproses' && result.value) {
+            form.append('tanggapan', result.value);
+        }
 
         fetch('pengaduan_ajax.php', { method: 'POST', body: form })
             .then(r => r.json())
@@ -181,6 +205,11 @@ function updateStatus(id, btn) {
                     btn.querySelector('.status-text').textContent = newStatus;
                     btn.disabled = false;
                     btn.classList.remove('opacity-50', 'cursor-wait');
+                    
+                    // Jika diproses, muat ulang halaman sebentar agar UI ter-update dengan teks tanggapannya
+                    if (newStatus === 'Diproses') {
+                        setTimeout(() => window.location.reload(), 1000);
+                    }
                 }
 
                 // Row pulse animation

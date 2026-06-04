@@ -124,7 +124,7 @@ if ($edit_id > 0) {
 }
 
 // === LIST DATA ===
-$stmt = $conn->prepare("SELECT id, judul, isi, status, created_at FROM pengaduan WHERE user_id = ? ORDER BY created_at DESC");
+$stmt = $conn->prepare("SELECT id, judul, isi, status, created_at, tanggapan_admin FROM pengaduan WHERE user_id = ? ORDER BY created_at DESC");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $list = $stmt->get_result();
@@ -224,6 +224,15 @@ $stmt->close();
                                 </div>
                                 <h4 class="text-lg font-black text-secondary-900 group-hover:text-primary-600 transition-colors mb-2"><?= htmlspecialchars($r['judul'] ?? 'Tanpa Subjek') ?></h4>
                                 <p class="text-secondary-500 text-sm leading-relaxed"><?= nl2br(htmlspecialchars($r['isi'])) ?></p>
+
+                                <?php if (!empty($r['tanggapan_admin'])): ?>
+                                <div class="mt-4 p-4 bg-blue-50/50 rounded-2xl border border-blue-100 text-sm shadow-sm relative">
+                                    <div class="absolute -top-3 left-4 bg-blue-100 text-blue-700 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-white shadow-sm flex items-center">
+                                        <i class="fas fa-reply mr-1.5"></i>Tanggapan Admin
+                                    </div>
+                                    <p class="text-blue-900 mt-1"><?= nl2br(htmlspecialchars($r['tanggapan_admin'])) ?></p>
+                                </div>
+                                <?php endif; ?>
                             </div>
 
                             <?php if ($status === 'diterima'): ?>
