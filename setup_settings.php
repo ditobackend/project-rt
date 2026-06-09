@@ -15,11 +15,7 @@ if ($conn->query($sql)) {
     
     $settings = [
         ['iuran_bulanan', '50000', 'iuran', 'Iuran Bulanan'],
-        ['iuran_keamanan', '25000', 'iuran', 'Iuran Keamanan'],
-        ['bca_no_rek', '123 456 7890', 'rekening', 'Nomor Rekening BCA'],
-        ['bca_nama', 'a.n. Kas RT 06/08', 'rekening', 'Nama Pemilik BCA'],
-        ['mandiri_no_rek', '098 765 4321', 'rekening', 'Nomor Rekening Mandiri'],
-        ['mandiri_nama', 'a.n. Kas RT 06/08', 'rekening', 'Nama Pemilik Mandiri']
+        ['iuran_keamanan', '25000', 'iuran', 'Iuran Keamanan']
     ];
 
     foreach ($settings as $s) {

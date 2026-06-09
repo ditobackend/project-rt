@@ -110,9 +110,6 @@ while ($s_row = mysqli_fetch_assoc($res_settings)) {
 // Default values if not found (fallback)
 $val_bulanan = isset($settings['iuran_bulanan']) ? number_format(preg_replace('/[^0-9]/', '', $settings['iuran_bulanan']), 0, ',', '.') : '50.000';
 $val_keamanan = isset($settings['iuran_keamanan']) ? number_format(preg_replace('/[^0-9]/', '', $settings['iuran_keamanan']), 0, ',', '.') : '25.000';
-$bank_pilihan = $settings['rek_bank_pilihan'] ?? 'Bank BCA';
-$bank_no = $settings['rek_bank_nomor'] ?? '123 456 7890';
-$bank_atas_nama = $settings['rek_bank_atas_nama'] ?? 'a.n. Kas RT 06/08';
 ?>
 
 <div class="mb-10">
@@ -309,29 +306,7 @@ $bank_atas_nama = $settings['rek_bank_atas_nama'] ?? 'a.n. Kas RT 06/08';
             </div>
         </div>
 
-        <!-- Rekening Manual -->
-        <div class="bg-secondary-900 p-8 rounded-[2.5rem] shadow-xl text-white relative overflow-hidden">
-            <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/5 rounded-full"></div>
-            <h3 class="text-lg font-black mb-6 flex items-center">
-                <i class="fas fa-university mr-3 text-primary-400"></i>
-                Transfer Manual
-            </h3>
-            <div class="space-y-4">
-                <div
-                    class="p-6 bg-white/5 rounded-3xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer group">
-                    <div class="flex justify-between items-center mb-1">
-                        <span
-                            class="text-[10px] font-black uppercase tracking-widest text-primary-400"><?= $bank_pilihan ?></span>
-                        <i class="far fa-copy text-sm opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                    </div>
-                    <p class="text-2xl font-bold tracking-wider mb-1"><?= $bank_no ?></p>
-                    <p class="text-xs text-secondary-400 font-medium"><?= $bank_atas_nama ?></p>
-                </div>
-            </div>
-            <p class="mt-6 text-[10px] text-secondary-500 leading-relaxed italic text-center">
-                *Simpan bukti transfer & konfirmasi ke pengurus RT melalui WhatsApp jika membayar manual.
-            </p>
-        </div>
+
     </div>
 </div>
 

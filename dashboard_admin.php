@@ -66,7 +66,7 @@ $page = $_GET['page'] ?? 'dashboard';
                         <a href="?page=pengaturan"
                             class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pengaturan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
                             <i class="fas fa-cog w-6"></i>
-                            <span class="font-medium">Pengaturan Sistem</span>
+                            <span class="font-medium">Pengaturan Tarif</span>
                         </a>
                     </nav>
                 </div>
@@ -173,6 +173,10 @@ $page = $_GET['page'] ?? 'dashboard';
                 <a href="?page=registrasi"
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'registrasi' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-user-plus w-6"></i><span>Registrasi Warga</span>
+                </a>
+                <a href="?page=pengaturan"
+                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pengaturan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
+                    <i class="fas fa-cog w-6"></i><span>Pengaturan Tarif</span>
                 </a>
             </nav>
 

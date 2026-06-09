@@ -20,12 +20,12 @@
         <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <!-- Akses Warga -->
             <div
-                class="group bg-white p-10 rounded-[3rem] shadow-sm border border-secondary-100 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 relative overflow-hidden">
+                class="group bg-white p-10 rounded-[3rem] shadow-sm border border-secondary-100 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 relative overflow-hidden flex flex-col">
                 <div
                     class="absolute -right-8 -top-8 w-32 h-32 bg-emerald-500/10 rounded-full group-hover:scale-150 transition-transform duration-700">
                 </div>
 
-                <div class="relative z-10 text-center">
+                <div class="relative z-10 text-center flex flex-col flex-1">
                     <div
                         class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
                         <i class="fas fa-users text-2xl"></i>
@@ -36,7 +36,7 @@
                         ribet.
                     </p>
                     <a href="loginwarga.php"
-                        class="inline-flex items-center justify-center w-full py-5 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-500/20 uppercase tracking-widest text-sm active:scale-95 group-hover:shadow-emerald-500/40">
+                        class="mt-auto inline-flex items-center justify-center w-full py-5 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-500/20 uppercase tracking-widest text-sm active:scale-95 group-hover:shadow-emerald-500/40">
                         Masuk Sebagai Warga
                         <i class="fas fa-arrow-right ml-3 text-xs group-hover:translate-x-1 transition-transform"></i>
                     </a>
@@ -45,12 +45,12 @@
 
             <!-- Akses Pengurus (Admin & Ketua RT) -->
             <div
-                class="group bg-white p-10 rounded-[3rem] shadow-sm border border-secondary-100 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 relative overflow-hidden">
+                class="group bg-white p-10 rounded-[3rem] shadow-sm border border-secondary-100 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 relative overflow-hidden flex flex-col">
                 <div
                     class="absolute -left-8 -bottom-8 w-32 h-32 bg-indigo-500/10 rounded-full group-hover:scale-150 transition-transform duration-700">
                 </div>
 
-                <div class="relative z-10 text-center">
+                <div class="relative z-10 text-center flex flex-col flex-1">
                     <div
                         class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500">
                         <i class="fas fa-user-shield text-2xl"></i>
@@ -60,7 +60,7 @@
                         Kelola warga, keuangan, dan kegiatan RT secara terpadu melalui portal pengurus.
                     </p>
                     <a href="loginadmin.php"
-                        class="inline-flex items-center justify-center w-full py-5 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-500/20 uppercase tracking-widest text-sm active:scale-95">
+                        class="mt-auto inline-flex items-center justify-center w-full py-5 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-500/20 uppercase tracking-widest text-sm active:scale-95">
                         Masuk Sebagai Pengurus
                         <i class="fas fa-lock ml-3 text-xs"></i>
                     </a>
