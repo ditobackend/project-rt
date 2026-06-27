@@ -1,4 +1,5 @@
 <?php
+ob_start();
 session_start();
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'warga') {
     header("Location: loginwarga.php");
@@ -23,7 +24,7 @@ if (isset($_SESSION['user_id'])) {
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar Desktop -->
         <aside
-            class="hidden md:flex flex-col w-72 bg-secondary-950 text-white transition-all duration-300 ease-in-out z-30 border-r border-white/5">
+            class="hidden md:flex flex-col w-72 shrink-0 bg-secondary-950 text-white transition-all duration-300 ease-in-out z-30 border-r border-white/5 overflow-hidden">
             <div class="p-8">
                 <div class="flex items-center space-x-3 mb-10">
                     <div class="bg-primary-500 p-2 rounded-xl shadow-lg shadow-primary-500/30">
@@ -251,3 +252,4 @@ if (isset($_SESSION['user_id'])) {
 </body>
 
 </html>
+<?php ob_end_flush(); ?>

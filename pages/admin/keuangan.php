@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_keuangan'])) {
 
     // Validasi: hanya pengeluaran yang boleh diedit
     // Ambil data asli dari DB — jumlah dari POST DIABAIKAN (tidak bisa diubah)
-    $stmt_check = $conn->prepare("SELECT jenis, jumlah FROM keuangan WHERE id = ?");
+    $stmt_check = $conn->prepare("SELECT jenis, jumlah, keterangan, tanggal FROM keuangan WHERE id = ?");
     $stmt_check->bind_param("i", $id);
     $stmt_check->execute();
     $res_check = $stmt_check->get_result();
@@ -92,11 +92,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_keuangan'])) {
     } else {
         // Gunakan jumlah ASLI dari DB, bukan dari form POST
         $jumlah_asli = $row_check['jumlah'];
+        $old_keterangan = $row_check['keterangan'];
+        $old_tanggal = $row_check['tanggal'];
         $keterangan = "$nama - $kategori - $catatan";
 
         $stmt = $conn->prepare("UPDATE keuangan SET tanggal=?, keterangan=?, jenis=?, jumlah=? WHERE id=?");
         $stmt->bind_param("sssdi", $tanggal, $keterangan, $jenis, $jumlah_asli, $id);
         if ($stmt->execute()) {
+            
+            // Sinkronisasi pembaruan ke tabel laporan
+            $check_table = $conn->query("SHOW COLUMNS FROM laporan LIKE 'sumber_id'");
+            if ($check_table && $check_table->num_rows > 0) {
+                $stmt_l = $conn->prepare("UPDATE laporan SET tanggal=?, keterangan=?, jenis=?, jumlah=? WHERE sumber_id=? AND jenis='pengeluaran'");
+                $stmt_l->bind_param("sssdi", $tanggal, $keterangan, $jenis, $jumlah_asli, $id);
+                $stmt_l->execute();
+                $stmt_l->close();
+            } else {
+                // Fallback jika sumber_id belum ada (cocokkan berdasarkan data lama)
+                $stmt_l = $conn->prepare("UPDATE laporan SET tanggal=?, keterangan=? WHERE keterangan=? AND jumlah=? AND tanggal=? AND jenis='pengeluaran'");
+                $stmt_l->bind_param("sssds", $tanggal, $keterangan, $old_keterangan, $jumlah_asli, $old_tanggal);
+                $stmt_l->execute();
+                $stmt_l->close();
+            }
+
             echo "<script>
                 document.addEventListener('DOMContentLoaded', function() {
                     Swal.fire({

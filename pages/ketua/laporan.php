@@ -24,7 +24,7 @@ if (!empty($filter_bulan) && $filter_bulan != 'semua') {
 }
 
 $whereClause = count($where) > 0 ? "WHERE " . implode(" AND ", $where) : "";
-$query_laporan = "SELECT * FROM laporan $whereClause ORDER BY tanggal DESC";
+$query_laporan = "SELECT * FROM laporan $whereClause ORDER BY tanggal DESC, id DESC";
 $stmt_laporan = $conn->prepare($query_laporan);
 if (!empty($params)) {
     $stmt_laporan->bind_param($types, ...$params);

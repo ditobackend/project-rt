@@ -33,11 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Masuk Portal Warga | RT 06/08</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -54,32 +56,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     </script>
     <style>
-        body { 
+        body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-image: radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
-                              radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
         }
-        .glass { 
-            background: rgba(255, 255, 255, 0.85); 
-            backdrop-filter: blur(20px); 
+
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.4);
         }
+
         .input-premium:focus-within {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px -5px rgba(5, 150, 105, 0.1);
         }
     </style>
 </head>
+
 <body class="bg-secondary-50 min-h-screen flex items-center justify-center p-6 relative">
     <!-- Decorative Elements -->
     <div class="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-primary-100 rounded-full blur-3xl opacity-50"></div>
-    <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-secondary-200 rounded-full blur-3xl opacity-50"></div>
+    <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-secondary-200 rounded-full blur-3xl opacity-50">
+    </div>
 
     <div class="w-full max-w-md relative z-10">
         <!-- Logo/Header -->
         <div class="text-center mb-8">
-            <a href="index.php" class="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-3xl shadow-xl shadow-primary-500/20 mb-4 hover:scale-105 transition-transform">
+            <a href="index.php"
+                class="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-3xl shadow-xl shadow-primary-500/20 mb-4 hover:scale-105 transition-transform">
                 <i class="fas fa-home text-white text-2xl"></i>
             </a>
             <h1 class="text-2xl font-black text-secondary-900 tracking-tight">Portal Warga</h1>
@@ -88,8 +95,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <!-- Login Card -->
         <div class="glass p-10 rounded-[2.5rem] shadow-2xl shadow-secondary-900/5 border border-white">
-            <?php if (isset($error)) : ?>
-                <div class="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 animate-in fade-in duration-500">
+            <?php if (isset($error)): ?>
+                <div
+                    class="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 animate-in fade-in duration-500">
                     <i class="fas fa-exclamation-circle text-red-500"></i>
                     <p class="text-xs font-bold text-red-700 uppercase tracking-tight"><?= $error ?></p>
                 </div>
@@ -97,40 +105,44 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <form method="POST" class="space-y-6">
                 <div>
-                    <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] mb-2 ml-1">Alamat Email</label>
+                    <label
+                        class="block text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] mb-2 ml-1">Alamat
+                        Email</label>
                     <div class="relative">
                         <i class="fas fa-envelope absolute left-5 top-1/2 -translate-y-1/2 text-secondary-300"></i>
                         <input type="email" name="email" placeholder="nama@email.com" required
-                               class="w-full pl-12 pr-6 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-600 rounded-2xl text-secondary-900 font-medium placeholder-secondary-300 transition-all">
+                            class="w-full pl-12 pr-6 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-600 rounded-2xl text-secondary-900 font-medium placeholder-secondary-300 transition-all">
                     </div>
                 </div>
 
                 <div class="input-premium transition-all">
-                    <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] mb-2 ml-1">Kata Sandi</label>
+                    <label
+                        class="block text-[10px] font-black text-secondary-400 uppercase tracking-[0.2em] mb-2 ml-1">Kata
+                        Sandi</label>
                     <div class="relative group">
-                        <i class="fas fa-lock absolute left-5 top-1/2 -translate-y-1/2 text-secondary-300 group-focus-within:text-primary-500 transition-colors"></i>
+                        <i
+                            class="fas fa-lock absolute left-5 top-1/2 -translate-y-1/2 text-secondary-300 group-focus-within:text-primary-500 transition-colors"></i>
                         <input type="password" name="password" id="passwordInput" placeholder="••••••••" required
-                               class="w-full pl-12 pr-12 py-4 bg-secondary-50/50 border border-transparent focus:border-primary-500/20 focus:ring-4 focus:ring-primary-500/5 rounded-2xl text-secondary-900 font-medium placeholder-secondary-300 transition-all outline-none">
-                        <button type="button" onclick="togglePassword()" class="absolute right-5 top-1/2 -translate-y-1/2 text-secondary-300 hover:text-primary-500 transition-colors focus:outline-none">
+                            class="w-full pl-12 pr-12 py-4 bg-secondary-50/50 border border-transparent focus:border-primary-500/20 focus:ring-4 focus:ring-primary-500/5 rounded-2xl text-secondary-900 font-medium placeholder-secondary-300 transition-all outline-none">
+                        <button type="button" onclick="togglePassword()"
+                            class="absolute right-5 top-1/2 -translate-y-1/2 text-secondary-300 hover:text-primary-500 transition-colors focus:outline-none">
                             <i id="eyeIcon" class="fas fa-eye"></i>
                         </button>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full py-5 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 hover:shadow-2xl hover:shadow-primary-600/30 transition-all uppercase tracking-widest text-sm active:scale-[0.98] flex items-center justify-center gap-3">
+                <button type="submit"
+                    class="w-full py-5 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 hover:shadow-2xl hover:shadow-primary-600/30 transition-all uppercase tracking-widest text-sm active:scale-[0.98] flex items-center justify-center gap-3">
                     Masuk Sekarang
                     <i class="fas fa-arrow-right text-xs"></i>
                 </button>
             </form>
-
-            <div class="mt-8 pt-8 border-t border-secondary-50 text-center">
-                <p class="text-secondary-400 text-sm font-medium">Lupa akun? Hubungi <a href="#" class="text-primary-600 font-bold hover:underline">Ketua RT</a></p>
-            </div>
         </div>
 
         <!-- Footer Link -->
         <div class="mt-8 text-center">
-            <a href="index.php" class="text-secondary-400 text-xs font-bold uppercase tracking-widest hover:text-primary-600 transition-colors">
+            <a href="index.php"
+                class="text-secondary-400 text-xs font-bold uppercase tracking-widest hover:text-primary-600 transition-colors">
                 <i class="fas fa-arrow-left mr-2 font-black"></i> Kembali Ke Beranda
             </a>
         </div>
@@ -139,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         function togglePassword() {
             const passwordInput = document.getElementById('passwordInput');
             const eyeIcon = document.getElementById('eyeIcon');
-            
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 eyeIcon.classList.remove('fa-eye');
@@ -152,4 +164,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     </script>
 </body>
+
 </html>

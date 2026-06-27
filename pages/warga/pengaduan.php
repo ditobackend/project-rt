@@ -10,9 +10,6 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = (int) $_SESSION['user_id'];
-$success = '';
-$error   = '';
-
 
 $has_judul = false;
 $colRes = $conn->query("SHOW COLUMNS FROM pengaduan LIKE 'judul'");
@@ -29,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $judul = $has_judul ? trim($_POST['judul'] ?? '') : null;
 
         if ($isi === '') {
-            $error = 'Isi laporan tidak boleh kosong.';
+            $_SESSION['flash_error'] = 'Isi laporan tidak boleh kosong.';
         } else {
             if ($has_judul) {
                 $stmt = $conn->prepare("INSERT INTO pengaduan (user_id, judul, isi, status) VALUES (?, ?, ?, 'Diterima')");
@@ -40,12 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             if ($stmt->execute()) {
                 $stmt->close();
-                $success = 'Laporan Anda telah berhasil terkirim ke pengurus RT.';
+                $_SESSION['flash_success'] = 'Laporan Anda telah berhasil terkirim ke pengurus RT.';
             } else {
-                $error = 'Sistem sibuk: ' . $stmt->error;
+                $_SESSION['flash_error'] = 'Sistem sibuk: ' . $stmt->error;
                 $stmt->close();
             }
         }
+        header("Location: dashboard_warga.php?page=pengaduan");
+        exit;
     }
 
     elseif ($action === 'update') {
@@ -54,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $judul = $has_judul ? trim($_POST['judul'] ?? '') : null;
 
         if ($id <= 0 || $isi === '') {
-            $error = 'Data tidak valid.';
+            $_SESSION['flash_error'] = 'Data tidak valid.';
         } else {
             $check = $conn->prepare("SELECT user_id, status FROM pengaduan WHERE id = ?");
             $check->bind_param("i", $id);
@@ -63,9 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $check->close();
 
             if (!$checkRes || (int)$checkRes['user_id'] !== $user_id) {
-                $error = 'Izin ditolak.';
+                $_SESSION['flash_error'] = 'Izin ditolak.';
             } elseif (strtolower($checkRes['status']) !== 'diterima') {
-                $error = 'Laporan yang sedang diproses tidak dapat diubah.';
+                $_SESSION['flash_error'] = 'Laporan yang sedang diproses tidak dapat diubah.';
             } else {
                 if ($has_judul) {
                     $stmt = $conn->prepare("UPDATE pengaduan SET judul = ?, isi = ? WHERE id = ?");
@@ -76,13 +75,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 if ($stmt->execute()) {
                     $stmt->close();
-                    $success = 'Perubahan laporan berhasil disimpan.';
+                    $_SESSION['flash_success'] = 'Perubahan laporan berhasil disimpan.';
                 } else {
-                    $error = 'Gagal menyimpan: ' . $stmt->error;
+                    $_SESSION['flash_error'] = 'Gagal menyimpan: ' . $stmt->error;
                     $stmt->close();
                 }
             }
         }
+        header("Location: dashboard_warga.php?page=pengaduan");
+        exit;
     }
 
     elseif ($action === 'delete') {
@@ -99,13 +100,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->bind_param("i", $id);
                 $stmt->execute();
                 $stmt->close();
-                $success = 'Laporan berhasil dihapus.';
+                $_SESSION['flash_success'] = 'Laporan berhasil dihapus.';
             } else {
-                $error = 'Gagal menghapus: Laporan mungkin sudah diproses admin.';
+                $_SESSION['flash_error'] = 'Gagal menghapus: Laporan mungkin sudah diproses admin.';
             }
         }
+        header("Location: dashboard_warga.php?page=pengaduan");
+        exit;
     }
 }
+
+// === AMBIL FLASH MESSAGE ===
+$flash_success = $_SESSION['flash_success'] ?? '';
+$flash_error   = $_SESSION['flash_error'] ?? '';
+unset($_SESSION['flash_success'], $_SESSION['flash_error']);
 
 // === FORM EDIT ===
 $edit_id = isset($_GET['edit']) ? (int) $_GET['edit'] : 0;
@@ -136,16 +144,14 @@ $stmt->close();
     <p class="text-secondary-500 mt-1">Sampaikan aspirasi, kendala, atau laporan Anda langsung ke pengurus RT.</p>
 </div>
 
-<div class="grid lg:grid-cols-3 gap-8 items-start">
+<div class="grid lg:grid-cols-3 gap-8" style="align-items: start;">
     <!-- Form Section -->
     <div class="lg:col-span-1">
-        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-secondary-100 sticky top-24">
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-secondary-100" id="formCard">
             <h3 class="text-xl font-black text-secondary-900 mb-8 flex items-center">
                 <i class="fas fa-paper-plane mr-3 text-primary-500 text-sm"></i>
                 <?= ($edit_row) ? 'Update Laporan' : 'Laporan Baru' ?>
             </h3>
-
-
 
             <form method="POST" action="dashboard_warga.php?page=pengaduan" class="space-y-6">
                 <input type="hidden" name="action" value="<?= ($edit_row) ? 'update' : 'create' ?>">
@@ -181,13 +187,13 @@ $stmt->close();
 
     <!-- List Section -->
     <div class="lg:col-span-2">
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-secondary-100 overflow-hidden">
-            <div class="px-8 py-8 border-b border-secondary-50 bg-secondary-50/30 flex justify-between items-center">
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-secondary-100 overflow-hidden flex flex-col" id="historyCard">
+            <div class="px-8 py-8 border-b border-secondary-50 bg-secondary-50/30 flex justify-between items-center shrink-0">
                 <h3 class="text-xl font-black text-secondary-900">Riwayat Pengaduan</h3>
                 <span class="px-3 py-1 bg-white rounded-full text-[10px] font-black text-secondary-400 border border-secondary-100 uppercase tracking-tighter"><?= $list->num_rows ?> Laporan</span>
             </div>
 
-            <div class="divide-y divide-secondary-50">
+            <div class="divide-y divide-secondary-50 overflow-y-auto custom-scrollbar" id="historyList">
                 <?php if ($list->num_rows === 0): ?>
                     <div class="p-20 text-center text-secondary-300">
                         <i class="fas fa-comment-slash text-6xl mb-6 block opacity-20"></i>
@@ -265,33 +271,50 @@ $stmt->close();
 </form>
 
 <script>
-// Toast Notification (muncul otomatis setelah redirect)
-const Toast = Swal.mixin({
-    toast: true,
-    position: 'top-end',
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-    customClass: {
-        popup: 'rounded-2xl shadow-xl text-sm font-bold',
+// Match historyCard height to formCard height
+function syncCardHeight() {
+    const formCard = document.getElementById('formCard');
+    const historyList = document.getElementById('historyList');
+    if (formCard && historyList && window.innerWidth >= 1024) {
+        const formHeight = formCard.offsetHeight;
+        const headerHeight = historyList.previousElementSibling ? historyList.previousElementSibling.offsetHeight : 88;
+        const listHeight = formHeight - headerHeight;
+        historyList.style.maxHeight = listHeight + 'px';
+    } else if (historyList) {
+        historyList.style.maxHeight = '400px';
     }
-});
+}
+syncCardHeight();
+window.addEventListener('resize', syncCardHeight);
 
-<?php if ($success): ?>
-Toast.fire({
-    icon: 'success',
-    title: '<?= addslashes($success) ?>'
-}).then(() => {
-    window.location.href = 'dashboard_warga.php?page=pengaduan';
-});
-<?php endif; ?>
+// Flash notification — runs after SweetAlert is ready
+window.addEventListener('load', function() {
+    <?php if ($flash_success): ?>
+    Swal.fire({
+        title: 'Berhasil!',
+        text: '<?= addslashes($flash_success) ?>',
+        icon: 'success',
+        confirmButtonColor: '#10b981',
+        customClass: {
+            popup: 'rounded-[2rem] shadow-xl border-0',
+            confirmButton: 'rounded-xl px-6 py-2.5 font-bold'
+        }
+    });
+    <?php endif; ?>
 
-<?php if ($error): ?>
-Toast.fire({
-    icon: 'error',
-    title: '<?= addslashes($error) ?>'
+    <?php if ($flash_error): ?>
+    Swal.fire({
+        title: 'Gagal!',
+        text: '<?= addslashes($flash_error) ?>',
+        icon: 'error',
+        confirmButtonColor: '#ef4444',
+        customClass: {
+            popup: 'rounded-[2rem] shadow-xl border-0',
+            confirmButton: 'rounded-xl px-6 py-2.5 font-bold'
+        }
+    });
+    <?php endif; ?>
 });
-<?php endif; ?>
 
 // Konfirmasi hapus
 function confirmDelete(id) {
