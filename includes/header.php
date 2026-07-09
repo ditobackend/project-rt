@@ -41,7 +41,13 @@ if ($role === 'warga') {
     <meta charset="UTF-8">
     <title>Sistem Pengelolaan RT</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <?php
+    // Hitung path ke assets berdasarkan kedalaman URL halaman yang sedang dibuka
+    $scriptDir = dirname($_SERVER['PHP_SELF'] ?? '/');
+    $depth = ($scriptDir === '/' || $scriptDir === '\\') ? 0 : substr_count(trim($scriptDir, '/'), '/');
+    $basePath = str_repeat('../', $depth);
+    ?>
+    <script src="<?= $basePath ?>assets/js/tailwind.cdn.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
