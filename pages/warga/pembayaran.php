@@ -175,25 +175,13 @@ $val_keamanan = isset($settings['iuran_keamanan']) ? number_format(preg_replace(
                     </div>
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <label
-                            class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Jumlah
-                            Pembayaran</label>
-                        <div class="relative">
-                            <input type="text" id="jumlah" name="jumlah" placeholder="Rp 0" required
-                                class="w-full px-5 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-black transition-all">
-                        </div>
-                    </div>
-                    <div>
-                        <label
-                            class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Metode
-                            Otomatis</label>
-                        <div
-                            class="w-full px-5 py-4 bg-secondary-100 text-secondary-400 border-0 rounded-2xl font-bold flex items-center gap-3">
-                            <i class="fas fa-bolt text-primary-500"></i>
-                            E-Wallet, VA, QRIS (Midtrans)
-                        </div>
+                <div>
+                    <label
+                        class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-2 ml-1">Jumlah
+                        Pembayaran</label>
+                    <div class="relative">
+                        <input type="text" id="jumlah" name="jumlah" placeholder="Rp 0" required
+                            class="w-full px-5 py-4 bg-secondary-50 border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl text-secondary-900 font-black transition-all">
                     </div>
                 </div>
 

@@ -19,6 +19,7 @@ $sqlPengeluaranBulanIni = $conn->query("SELECT SUM(jumlah) as total FROM keuanga
 $pengeluaranBulanIni = $sqlPengeluaranBulanIni->fetch_assoc()['total'] ?? 0;
 
 // Kegiatan Terbaru (Otomatis Hilang Jika Sudah Selesai)
+// Hanya tampilkan kegiatan yang disetujui atau kegiatan langsung dari RT (diajukan_oleh IS NULL)
 $queryKegiatan = $conn->query("SELECT *, 
     CASE 
         WHEN NOW() >= CONCAT(tanggal, ' ', jam_mulai) AND NOW() <= CONCAT(tanggal, ' ', jam_selesai) THEN 'live'
@@ -27,6 +28,7 @@ $queryKegiatan = $conn->query("SELECT *,
     END as status_realtime
     FROM kegiatan 
     WHERE CONCAT(tanggal, ' ', jam_selesai) >= NOW() 
+    AND (status_persetujuan = 'disetujui' OR diajukan_oleh IS NULL)
     ORDER BY tanggal ASC, jam_mulai ASC 
     LIMIT 10");
 

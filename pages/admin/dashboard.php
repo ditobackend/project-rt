@@ -10,7 +10,7 @@ $pengeluaranPenuh = $sqlPengeluaran->fetch_assoc()['total'] ?? 0;
 
 $saldoKasPenuh = $pemasukanPenuh - $pengeluaranPenuh;
 
-$sqlKegiatan = $conn->query("SELECT COUNT(*) as total FROM kegiatan WHERE CONCAT(tanggal, ' ', jam_selesai) >= NOW()");
+$sqlKegiatan = $conn->query("SELECT COUNT(*) as total FROM kegiatan WHERE CONCAT(tanggal, ' ', jam_selesai) >= NOW() AND (status_persetujuan = 'disetujui' OR diajukan_oleh IS NULL)");
 $kegiatanAktif = $sqlKegiatan->fetch_assoc()['total'] ?? 0;
 
 // Data Bulan Ini untuk Ringkasan Keuangan
@@ -25,6 +25,7 @@ $pengeluaranBulanIni = $sqlPengeluaranBulanIni->fetch_assoc()['total'] ?? 0;
 $queryAktivitas = $conn->query("SELECT * FROM keuangan ORDER BY tanggal DESC, id DESC LIMIT 15");
 
 // Data Kegiatan Terbaru/Mendatang (Otomatis Hilang Jika Sudah Selesai)
+// Hanya tampilkan kegiatan yang disetujui atau kegiatan langsung dari RT (diajukan_oleh IS NULL)
 $queryKegiatan = $conn->query("SELECT *, 
     CASE 
         WHEN NOW() >= CONCAT(tanggal, ' ', jam_mulai) AND NOW() <= CONCAT(tanggal, ' ', jam_selesai) THEN 'live'
@@ -33,6 +34,7 @@ $queryKegiatan = $conn->query("SELECT *,
     END as status_realtime
     FROM kegiatan 
     WHERE CONCAT(tanggal, ' ', jam_selesai) >= NOW() 
+    AND (status_persetujuan = 'disetujui' OR diajukan_oleh IS NULL)
     ORDER BY tanggal ASC, jam_mulai ASC 
     LIMIT 10");
 ?>
@@ -55,11 +57,11 @@ $queryKegiatan = $conn->query("SELECT *,
                 class="bg-green-100 text-green-600 w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-inner">
                 <i class="fas fa-arrow-down-long text-lg"></i>
             </div>
-            <span class="text-secondary-500 text-sm font-semibold uppercase tracking-wider">Total Pemasukan</span>
+            <span class="text-secondary-500 text-sm font-semibold uppercase tracking-wider">Pemasukan Bulan Ini</span>
             <span class="text-2xl font-black text-secondary-900 mt-1">Rp
-                <?= number_format($pemasukanPenuh, 0, ',', '.') ?></span>
+                <?= number_format($pemasukanBulanIni, 0, ',', '.') ?></span>
             <div class="mt-4 flex items-center text-xs font-bold text-green-600">
-                <i class="fas fa-chart-line mr-1"></i> Seluruh Pemasukan
+                <i class="fas fa-calendar-alt mr-1"></i> <?= date('F Y') ?>
             </div>
         </div>
     </div>
@@ -75,11 +77,11 @@ $queryKegiatan = $conn->query("SELECT *,
                 class="bg-red-100 text-red-600 w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-inner">
                 <i class="fas fa-arrow-up-long text-lg"></i>
             </div>
-            <span class="text-secondary-500 text-sm font-semibold uppercase tracking-wider">Total Pengeluaran</span>
+            <span class="text-secondary-500 text-sm font-semibold uppercase tracking-wider">Pengeluaran Bulan Ini</span>
             <span class="text-2xl font-black text-secondary-900 mt-1">Rp
-                <?= number_format($pengeluaranPenuh, 0, ',', '.') ?></span>
+                <?= number_format($pengeluaranBulanIni, 0, ',', '.') ?></span>
             <div class="mt-4 flex items-center text-xs font-bold text-red-600">
-                <i class="fas fa-chart-pie mr-1"></i> Seluruh Pengeluaran
+                <i class="fas fa-calendar-alt mr-1"></i> <?= date('F Y') ?>
             </div>
         </div>
     </div>
