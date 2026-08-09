@@ -51,11 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $keuangan_stmt->close();
 
                     // Simpan ke Riwayat Laporan (Consolidated)
-                    $pembayaran_id_result = $conn->query("SELECT id FROM pembayaran WHERE order_id = '$order_id'");
-                    $pembayaran_id = ($pembayaran_id_result->num_rows > 0) ? $pembayaran_id_result->fetch_assoc()['id'] : 0;
-
-                    $stmt_l = $conn->prepare("INSERT INTO laporan (tanggal, keterangan, jenis, jumlah, sumber_id) VALUES (CURDATE(), ?, 'pemasukan', ?, ?)");
-                    $stmt_l->bind_param("sdi", $keterangan, $jumlah, $pembayaran_id);
+                    $stmt_l = $conn->prepare("INSERT INTO laporan (tanggal, keterangan, jenis, jumlah) VALUES (CURDATE(), ?, 'pemasukan', ?)");
+                    $stmt_l->bind_param("sd", $keterangan, $jumlah);
                     $stmt_l->execute();
                     $stmt_l->close();
                 } else {
