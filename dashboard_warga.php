@@ -64,6 +64,16 @@ if (isset($_SESSION['user_id'])) {
                         <i class="fas fa-credit-card w-6"></i>
                         <span class="font-medium">Iuran & Pembayaran</span>
                     </a>
+                    <a href="?page=keluarga"
+                        class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'keluarga' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
+                        <i class="fas fa-users w-6"></i>
+                        <span class="font-medium">Data Keluarga</span>
+                    </a>
+                    <a href="?page=surat_pengajuan"
+                        class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'surat_pengajuan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
+                        <i class="fas fa-envelope-open-text w-6"></i>
+                        <span class="font-medium">Surat Pengantar</span>
+                    </a>
                 </nav>
             </div>
 
@@ -175,6 +185,14 @@ if (isset($_SESSION['user_id'])) {
                 <a href="?page=pembayaran"
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pembayaran' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-credit-card w-6"></i><span>Iuran & Pembayaran</span>
+                </a>
+                <a href="?page=keluarga"
+                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'keluarga' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
+                    <i class="fas fa-users w-6"></i><span>Data Keluarga</span>
+                </a>
+                <a href="?page=surat_pengajuan"
+                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'surat_pengajuan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
+                    <i class="fas fa-envelope-open-text w-6"></i><span>Surat Pengantar</span>
                 </a>
             </nav>
 
