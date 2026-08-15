@@ -48,7 +48,7 @@ if ($kk_data) {
     <div class="mt-6 p-4 bg-indigo-50 rounded-2xl border border-indigo-100 text-left max-w-xs">
         <p class="text-xs font-black text-indigo-600 uppercase tracking-wider mb-2"><i class="fas fa-info-circle mr-1"></i>Alur Pendaftaran</p>
         <ol class="text-xs text-indigo-700 space-y-1 list-decimal list-inside">
-            <li>Hubungi Admin RT dengan membawa KK & KTP</li>
+            <li>Hubungi Admin RT dengan membawa KK & Kartu Identitas</li>
             <li>Admin mendaftarkan data KK Anda</li>
             <li>Anda bisa menambahkan anggota keluarga</li>
             <li>Pengajuan surat dapat dilakukan</li>
@@ -142,11 +142,11 @@ if ($kk_data) {
             <?php endif; ?>
         </div>
 
-        <!-- Foto KTP Link -->
+        <!-- Foto Kartu Identitas Link -->
         <?php if ($row['foto_ktp']): ?>
         <a href="<?= htmlspecialchars($row['foto_ktp']) ?>" target="_blank"
             class="w-full text-center py-2 text-xs font-bold bg-secondary-50 text-secondary-600 rounded-xl hover:bg-secondary-100 transition-colors block">
-            <i class="fas fa-image mr-1"></i> Lihat KTP
+            <i class="fas fa-image mr-1"></i> Lihat Kartu Identitas
         </a>
         <?php endif; ?>
     </div>

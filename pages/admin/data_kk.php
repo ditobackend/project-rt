@@ -472,7 +472,7 @@ unset($_SESSION['open_kk']);
         <div class="p-6 border-b border-secondary-100 flex justify-between items-center bg-emerald-50">
             <div>
                 <h3 class="text-lg font-black text-emerald-900" id="modalAnggotaTitle">Tambah Anggota Keluarga</h3>
-                <p class="text-emerald-500 text-xs mt-0.5">Isi sesuai KK dan KTP resmi</p>
+                <p class="text-emerald-500 text-xs mt-0.5">Isi sesuai KK dan Kartu Identitas resmi</p>
             </div>
             <button onclick="closeModalAnggota()" class="text-emerald-400 hover:text-emerald-700 transition-colors"><i class="fas fa-times text-xl"></i></button>
         </div>
@@ -494,7 +494,7 @@ unset($_SESSION['open_kk']);
                     <!-- Nama Lengkap -->
                     <div class="md:col-span-2">
                         <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-1.5">Nama Lengkap <span class="text-red-500">*</span></label>
-                        <input type="text" name="nama_lengkap" id="a_nama" required placeholder="Sesuai KTP"
+                        <input type="text" name="nama_lengkap" id="a_nama" required placeholder="Sesuai Kartu Identitas"
                             class="w-full px-4 py-3 bg-secondary-50 rounded-xl border-0 focus:ring-2 focus:ring-emerald-500 text-secondary-900 font-medium">
                     </div>
 
@@ -636,9 +636,9 @@ unset($_SESSION['open_kk']);
                             class="w-full px-4 py-3 bg-secondary-50 rounded-xl border-0 focus:ring-2 focus:ring-emerald-500 text-secondary-900 font-medium">
                     </div>
 
-                    <!-- Foto KTP -->
+                    <!-- Foto Kartu Identitas -->
                     <div class="md:col-span-2">
-                        <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-1.5">Foto / Scan KTP</label>
+                        <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-1.5">Foto / Scan Kartu Identitas</label>
                         <input type="file" name="foto_ktp" accept="image/*"
                             class="w-full px-4 py-3 bg-secondary-50 rounded-xl border-0 focus:ring-2 focus:ring-emerald-500 text-secondary-700 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-emerald-100 file:text-emerald-700 file:font-bold file:text-xs">
                         <p id="foto_ktp_current" class="text-xs text-secondary-400 mt-1"></p>
@@ -776,7 +776,7 @@ function renderAnggotaTable(anggota, kkId) {
             : `<span class="ml-1 text-[9px] font-black bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full uppercase">Warga</span>`;
 
         const ktpLink = a.foto_ktp
-            ? `<a href="${a.foto_ktp}" target="_blank" class="text-[10px] font-bold bg-secondary-100 text-secondary-600 px-2 py-0.5 rounded hover:bg-secondary-200">KTP</a>`
+            ? `<a href="${a.foto_ktp}" target="_blank" class="text-[10px] font-bold bg-secondary-100 text-secondary-600 px-2 py-0.5 rounded hover:bg-secondary-200">Kartu Identitas</a>`
             : '';
 
         html += `<tr class="hover:bg-secondary-50/50 transition-colors">

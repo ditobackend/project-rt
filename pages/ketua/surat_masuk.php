@@ -73,7 +73,7 @@ $query = $conn->query("
                                 <p class="text-xs text-secondary-500 font-mono"><?= htmlspecialchars($row['nik']) ?></p>
                                 <div class="flex gap-2 mt-2">
                                     <?php if($row['foto_ktp']): ?>
-                                        <a href="<?= htmlspecialchars($row['foto_ktp']) ?>" target="_blank" class="text-[10px] font-bold bg-secondary-100 text-secondary-600 px-2 py-1 rounded hover:bg-secondary-200">Cek KTP</a>
+                                        <a href="<?= htmlspecialchars($row['foto_ktp']) ?>" target="_blank" class="text-[10px] font-bold bg-secondary-100 text-secondary-600 px-2 py-1 rounded hover:bg-secondary-200">Cek Kartu Identitas</a>
                                     <?php endif; ?>
                                     <?php if($row['foto_kk']): ?>
                                         <a href="<?= htmlspecialchars($row['foto_kk']) ?>" target="_blank" class="text-[10px] font-bold bg-secondary-100 text-secondary-600 px-2 py-1 rounded hover:bg-secondary-200">Cek KK</a>
@@ -141,7 +141,7 @@ $query = $conn->query("
                 <input type="hidden" name="id_surat" id="tolak_id_surat">
                 
                 <label class="block text-xs font-bold text-secondary-600 mb-2">Alasan Penolakan *</label>
-                <textarea name="alasan_tolak" required rows="3" placeholder="Misal: Foto KTP tidak jelas / Dokumen kurang..." class="w-full px-4 py-3 bg-secondary-50 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-red-500 transition-all text-secondary-900 font-medium resize-none mb-4"></textarea>
+                <textarea name="alasan_tolak" required rows="3" placeholder="Misal: Foto Kartu Identitas tidak jelas / Dokumen kurang..." class="w-full px-4 py-3 bg-secondary-50 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-red-500 transition-all text-secondary-900 font-medium resize-none mb-4"></textarea>
 
                 <div class="flex justify-end gap-3">
                     <button type="button" onclick="closeTolakModal()" class="px-5 py-2 text-secondary-600 font-bold hover:bg-secondary-200 rounded-xl transition-colors text-sm">Batal</button>

@@ -161,7 +161,7 @@ $query_anggota = $kk_id ? $conn->query("SELECT id, nama_lengkap, status_hubungan
                                 <option value="<?= $k['id'] ?>"><?= htmlspecialchars($k['nama_lengkap']) ?> (<?= $k['status_hubungan'] ?>)</option>
                             <?php endwhile; ?>
                         </select>
-                        <p class="text-[10px] text-secondary-400 mt-1"><i class="fas fa-info-circle mr-1"></i>Data KTP anggota terpilih akan otomatis terlampir untuk Ketua RT.</p>
+                        <p class="text-[10px] text-secondary-400 mt-1"><i class="fas fa-info-circle mr-1"></i>Data Kartu Identitas anggota terpilih akan otomatis terlampir untuk Ketua RT.</p>
                     </div>
 
                     <div>

@@ -268,9 +268,9 @@ function viewMemberDetail(data) {
     if (data.foto_ktp) {
         fotoHtml = `
             <div class="mt-6 mb-2">
-                <h4 class="text-xs font-black text-secondary-400 uppercase tracking-widest mb-3 border-b border-secondary-100 pb-2">Dokumen KTP</h4>
+                <h4 class="text-xs font-black text-secondary-400 uppercase tracking-widest mb-3 border-b border-secondary-100 pb-2">Dokumen Kartu Identitas</h4>
                 <a href="${data.foto_ktp}" target="_blank" class="block w-48 h-32 rounded-xl overflow-hidden border-2 border-secondary-100 shadow-sm hover:shadow-md transition-all">
-                    <img src="${data.foto_ktp}" alt="KTP ${data.nama_lengkap}" class="w-full h-full object-cover">
+                    <img src="${data.foto_ktp}" alt="Kartu Identitas ${data.nama_lengkap}" class="w-full h-full object-cover">
                 </a>
             </div>
         `;
