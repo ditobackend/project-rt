@@ -43,25 +43,30 @@ $page = $_GET['page'] ?? 'dashboard';
                             <i class="fas fa-tachometer-alt w-6"></i>
                             <span class="font-medium">Dashboard Utama</span>
                         </a>
-                        <a href="?page=kegiatan"
-                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
-                            <i class="fas fa-calendar-alt w-6"></i>
-                            <span class="font-medium">Data Kegiatan</span>
+                        <a href="?page=registrasi"
+                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'registrasi' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
+                            <i class="fas fa-user-plus w-6"></i>
+                            <span class="font-medium">Registrasi Akun Warga</span>
+                        </a>
+                        <a href="?page=data_kk"
+                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'data_kk' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
+                            <i class="fas fa-id-card w-6"></i>
+                            <span class="font-medium">Data KK Warga</span>
                         </a>
                         <a href="?page=keuangan"
                             class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'keuangan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
                             <i class="fas fa-chart-line w-6"></i>
                             <span class="font-medium">Data Keuangan</span>
                         </a>
+                        <a href="?page=kegiatan"
+                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
+                            <i class="fas fa-calendar-alt w-6"></i>
+                            <span class="font-medium">Data Kegiatan</span>
+                        </a>
                         <a href="?page=pengaduan"
                             class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pengaduan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
                             <i class="fas fa-comment-dots w-6"></i>
                             <span class="font-medium">Pengaduan Warga</span>
-                        </a>
-                        <a href="?page=registrasi"
-                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'registrasi' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
-                            <i class="fas fa-user-plus w-6"></i>
-                            <span class="font-medium">Registrasi Warga</span>
                         </a>
                         <a href="?page=pengaturan"
                             class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pengaturan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
@@ -158,21 +163,25 @@ $page = $_GET['page'] ?? 'dashboard';
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'dashboard' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-tachometer-alt w-6"></i><span>Dashboard Utama</span>
                 </a>
-                <a href="?page=kegiatan"
-                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
-                    <i class="fas fa-calendar-alt w-6"></i><span>Data Kegiatan</span>
+                <a href="?page=registrasi"
+                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'registrasi' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
+                    <i class="fas fa-user-plus w-6"></i><span>Registrasi Akun Warga</span>
+                </a>
+                <a href="?page=data_kk"
+                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'data_kk' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
+                    <i class="fas fa-id-card w-6"></i><span>Data KK Warga</span>
                 </a>
                 <a href="?page=keuangan"
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'keuangan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-chart-line w-6"></i><span>Data Keuangan</span>
                 </a>
+                <a href="?page=kegiatan"
+                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
+                    <i class="fas fa-calendar-alt w-6"></i><span>Data Kegiatan</span>
+                </a>
                 <a href="?page=pengaduan"
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pengaduan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-comment-dots w-6"></i><span>Pengaduan Warga</span>
-                </a>
-                <a href="?page=registrasi"
-                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'registrasi' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
-                    <i class="fas fa-user-plus w-6"></i><span>Registrasi Warga</span>
                 </a>
                 <a href="?page=pengaturan"
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pengaturan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">

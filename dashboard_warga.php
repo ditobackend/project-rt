@@ -39,15 +39,20 @@ if (isset($_SESSION['user_id'])) {
                         <i class="fas fa-tachometer-alt w-6"></i>
                         <span class="font-medium">Dashboard Utama</span>
                     </a>
-                    <a href="?page=kegiatan"
-                        class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
-                        <i class="fas fa-calendar-alt w-6"></i>
-                        <span class="font-medium">Info Kegiatan</span>
+                    <a href="?page=keluarga"
+                        class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'keluarga' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
+                        <i class="fas fa-users w-6"></i>
+                        <span class="font-medium">Data Keluarga</span>
                     </a>
                     <a href="?page=keuangan"
                         class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'keuangan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
                         <i class="fas fa-chart-line w-6"></i>
-                        <span class="font-medium">Transparansi Dana</span>
+                        <span class="font-medium">Info Keuangan</span>
+                    </a>
+                    <a href="?page=kegiatan"
+                        class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
+                        <i class="fas fa-calendar-alt w-6"></i>
+                        <span class="font-medium">Info Kegiatan</span>
                     </a>
                     <a href="?page=pengaduan"
                         class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pengaduan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
@@ -59,20 +64,15 @@ if (isset($_SESSION['user_id'])) {
                         </span>
                         <?php endif; ?>
                     </a>
-                    <a href="?page=pembayaran"
-                        class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pembayaran' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
-                        <i class="fas fa-credit-card w-6"></i>
-                        <span class="font-medium">Iuran & Pembayaran</span>
-                    </a>
-                    <a href="?page=keluarga"
-                        class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'keluarga' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
-                        <i class="fas fa-users w-6"></i>
-                        <span class="font-medium">Data Keluarga</span>
-                    </a>
                     <a href="?page=surat_pengajuan"
                         class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'surat_pengajuan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
                         <i class="fas fa-envelope-open-text w-6"></i>
                         <span class="font-medium">Surat Pengantar</span>
+                    </a>
+                    <a href="?page=pembayaran"
+                        class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pembayaran' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
+                        <i class="fas fa-credit-card w-6"></i>
+                        <span class="font-medium">Pembayaran Iuran</span>
                     </a>
                 </nav>
             </div>
@@ -164,13 +164,17 @@ if (isset($_SESSION['user_id'])) {
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'dashboard' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-tachometer-alt w-6"></i><span>Dashboard Utama</span>
                 </a>
-                <a href="?page=kegiatan"
-                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
-                    <i class="fas fa-calendar-alt w-6"></i><span>Info Kegiatan</span>
+                <a href="?page=keluarga"
+                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'keluarga' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
+                    <i class="fas fa-users w-6"></i><span>Data Keluarga</span>
                 </a>
                 <a href="?page=keuangan"
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'keuangan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
-                    <i class="fas fa-chart-line w-6"></i><span>Transparansi Dana</span>
+                    <i class="fas fa-chart-line w-6"></i><span>Info Keuangan</span>
+                </a>
+                <a href="?page=kegiatan"
+                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
+                    <i class="fas fa-calendar-alt w-6"></i><span>Info Kegiatan</span>
                 </a>
                 <a href="?page=pengaduan"
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pengaduan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
@@ -182,17 +186,13 @@ if (isset($_SESSION['user_id'])) {
                     </span>
                     <?php endif; ?>
                 </a>
-                <a href="?page=pembayaran"
-                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pembayaran' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
-                    <i class="fas fa-credit-card w-6"></i><span>Iuran & Pembayaran</span>
-                </a>
-                <a href="?page=keluarga"
-                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'keluarga' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
-                    <i class="fas fa-users w-6"></i><span>Data Keluarga</span>
-                </a>
                 <a href="?page=surat_pengajuan"
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'surat_pengajuan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-envelope-open-text w-6"></i><span>Surat Pengantar</span>
+                </a>
+                <a href="?page=pembayaran"
+                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'pembayaran' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
+                    <i class="fas fa-credit-card w-6"></i><span>Pembayaran Iuran</span>
                 </a>
             </nav>
 

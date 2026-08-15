@@ -28,9 +28,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
 // Ambil semua data pengajuan
 $query = $conn->query("
-    SELECT sp.*, dk.nama_lengkap, dk.nik, dk.foto_ktp, dk.foto_kk, u.nama as nama_pengaju 
+    SELECT sp.*, ak.nama_lengkap, ak.nik, ak.foto_ktp, kk.foto_kk, u.nama as nama_pengaju 
     FROM surat_pengantar sp 
-    JOIN data_keluarga dk ON sp.data_keluarga_id = dk.id 
+    JOIN anggota_keluarga ak ON sp.anggota_keluarga_id = ak.id 
+    JOIN kartu_keluarga kk ON ak.kk_id = kk.id
     JOIN users u ON sp.user_id = u.id 
     ORDER BY FIELD(sp.status, 'pending', 'disetujui', 'ditolak'), sp.tanggal_pengajuan DESC
 ");

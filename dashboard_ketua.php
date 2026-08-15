@@ -43,6 +43,16 @@ $page = $_GET['page'] ?? 'dashboard';
                             <i class="fas fa-tachometer-alt w-6"></i>
                             <span class="font-medium">Dashboard Utama</span>
                         </a>
+                        <a href="?page=data_kk"
+                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'data_kk' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
+                            <i class="fas fa-id-card w-6"></i>
+                            <span class="font-medium">Data KK Warga</span>
+                        </a>
+                        <a href="?page=surat_masuk"
+                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'surat_masuk' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
+                            <i class="fas fa-envelope-open-text w-6"></i>
+                            <span class="font-medium">Pengajuan Surat</span>
+                        </a>
                         <a href="?page=kegiatan_approval"
                             class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'kegiatan_approval' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
                             <i class="fas fa-tasks w-6"></i>
@@ -57,11 +67,6 @@ $page = $_GET['page'] ?? 'dashboard';
                             class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'laporan_kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
                             <i class="fas fa-file-alt w-6"></i>
                             <span class="font-medium">Laporan Kegiatan</span>
-                        </a>
-                        <a href="?page=surat_masuk"
-                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'surat_masuk' ? 'sidebar-active' : 'text-secondary-400 hover:text-white hover:bg-white/5' ?>">
-                            <i class="fas fa-envelope-open-text w-6"></i>
-                            <span class="font-medium">Pengajuan Surat</span>
                         </a>
                     </nav>
                 </div>
@@ -114,7 +119,7 @@ $page = $_GET['page'] ?? 'dashboard';
                 <div class="max-w-6xl mx-auto">
                     <?php
                     // Map pages for Ketua RT
-                    $allowed_pages = ['dashboard', 'kegiatan_approval', 'laporan', 'laporan_kegiatan', 'surat_masuk'];
+                    $allowed_pages = ['dashboard', 'kegiatan_approval', 'laporan', 'laporan_kegiatan', 'surat_masuk', 'data_kk'];
                     if (in_array($page, $allowed_pages)) {
                         if ($page === 'dashboard') {
                             $file = __DIR__ . "/pages/ketua/dashboard.php";
@@ -164,6 +169,14 @@ $page = $_GET['page'] ?? 'dashboard';
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'dashboard' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-tachometer-alt w-6"></i><span>Dashboard Utama</span>
                 </a>
+                <a href="?page=data_kk"
+                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'data_kk' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
+                    <i class="fas fa-id-card w-6"></i><span>Data KK Warga</span>
+                </a>
+                <a href="?page=surat_masuk"
+                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'surat_masuk' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
+                    <i class="fas fa-envelope-open-text w-6"></i><span>Pengajuan Surat</span>
+                </a>
                 <a href="?page=kegiatan_approval"
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'kegiatan_approval' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-tasks w-6"></i><span>Pengajuan Kegiatan</span>
@@ -175,10 +188,6 @@ $page = $_GET['page'] ?? 'dashboard';
                 <a href="?page=laporan_kegiatan"
                     class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'laporan_kegiatan' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
                     <i class="fas fa-file-alt w-6"></i><span>Laporan Kegiatan</span>
-                </a>
-                <a href="?page=surat_masuk"
-                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?= $page == 'surat_masuk' ? 'sidebar-active' : 'text-secondary-400 hover:text-white' ?>">
-                    <i class="fas fa-envelope-open-text w-6"></i><span>Pengajuan Surat</span>
                 </a>
             </nav>
 

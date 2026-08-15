@@ -3,30 +3,41 @@ require_once __DIR__ . '/../../config/database.php';
 
 $user_id = $_SESSION['user_id'];
 
+// Cek apakah warga sudah punya KK
+$kk_query = $conn->query("SELECT id, no_kk FROM kartu_keluarga WHERE user_id = $user_id LIMIT 1");
+$kk_data  = $kk_query ? $kk_query->fetch_assoc() : null;
+$kk_id    = $kk_data ? $kk_data['id'] : 0;
+
+// Auto-patch database: pastikan data_keluarga_id bersifat NULLABLE agar INSERT tidak error
+@$conn->query("ALTER TABLE `surat_pengantar` MODIFY COLUMN `data_keluarga_id` INT NULL");
+
 // Handle Submit Pengajuan
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_surat'])) {
-    $data_keluarga_id = (int)$_POST['data_keluarga_id'];
+    if (!$kk_data) {
+        header("Location: ?page=surat_pengajuan&msg=no_kk"); exit;
+    }
+    $anggota_id  = (int)$_POST['anggota_id'];
     $jenis_surat = $conn->real_escape_string($_POST['jenis_surat']);
-    $keperluan = $conn->real_escape_string($_POST['keperluan']);
+    $keperluan   = $conn->real_escape_string($_POST['keperluan']);
 
-    $sql = "INSERT INTO surat_pengantar (user_id, data_keluarga_id, jenis_surat, keperluan, status) 
-            VALUES ($user_id, $data_keluarga_id, '$jenis_surat', '$keperluan', 'pending')";
+    $sql = "INSERT INTO surat_pengantar (user_id, anggota_keluarga_id, jenis_surat, keperluan, status) 
+            VALUES ($user_id, $anggota_id, '$jenis_surat', '$keperluan', 'pending')";
     $conn->query($sql);
-    header("Location: ?page=surat_pengajuan&msg=added");
-    exit;
+    header("Location: ?page=surat_pengajuan&msg=added"); exit;
 }
 
 // Ambil data pengajuan
 $query_surat = $conn->query("
-    SELECT sp.*, dk.nama_lengkap, dk.nik 
+    SELECT sp.*, ak.nama_lengkap, ak.nik 
     FROM surat_pengantar sp 
-    JOIN data_keluarga dk ON sp.data_keluarga_id = dk.id 
+    JOIN anggota_keluarga ak ON sp.anggota_keluarga_id = ak.id 
     WHERE sp.user_id = $user_id 
     ORDER BY sp.tanggal_pengajuan DESC
 ");
 
-// Ambil data keluarga untuk dropdown
-$query_keluarga = $conn->query("SELECT id, nama_lengkap, status_hubungan FROM data_keluarga WHERE user_id = $user_id");
+// Ambil data anggota keluarga untuk dropdown
+$query_anggota = $kk_id ? $conn->query("SELECT id, nama_lengkap, status_hubungan FROM anggota_keluarga WHERE kk_id = $kk_id ORDER BY nama_lengkap ASC") : null;
+
 ?>
 
 <div class="mb-10 flex justify-between items-center">
@@ -40,10 +51,17 @@ $query_keluarga = $conn->query("SELECT id, nama_lengkap, status_hubungan FROM da
 </div>
 
 <?php if (isset($_GET['msg'])): ?>
+    <?php if ($_GET['msg'] === 'added'): ?>
     <div class="bg-emerald-50 text-emerald-600 p-4 rounded-xl mb-6 flex items-center gap-3 border border-emerald-200">
         <i class="fas fa-check-circle text-xl"></i>
         <span class="font-bold">Pengajuan surat berhasil dikirim! Menunggu persetujuan Ketua RT.</span>
     </div>
+    <?php elseif ($_GET['msg'] === 'no_kk'): ?>
+    <div class="bg-amber-50 text-amber-700 p-4 rounded-xl mb-6 flex items-center gap-3 border border-amber-200">
+        <i class="fas fa-exclamation-triangle text-xl"></i>
+        <span class="font-bold">Kartu Keluarga Anda belum terdaftar. Hubungi Admin RT terlebih dahulu.</span>
+    </div>
+    <?php endif; ?>
 <?php endif; ?>
 
 <div class="bg-white rounded-3xl shadow-sm border border-secondary-100 overflow-hidden">
@@ -119,24 +137,31 @@ $query_keluarga = $conn->query("SELECT id, nama_lengkap, status_hubungan FROM da
         </div>
         
         <div class="p-6">
-            <?php if ($query_keluarga->num_rows == 0): ?>
+            <?php if (!$kk_data): ?>
                 <div class="text-center py-6">
-                    <i class="fas fa-exclamation-circle text-4xl text-yellow-400 mb-3"></i>
-                    <p class="font-bold text-secondary-900">Data Keluarga Kosong</p>
-                    <p class="text-sm text-secondary-500 mb-4">Anda belum menambahkan data keluarga. Silakan lengkapi data keluarga terlebih dahulu.</p>
+                    <i class="fas fa-id-card text-4xl text-amber-400 mb-3"></i>
+                    <p class="font-bold text-secondary-900">KK Belum Terdaftar</p>
+                    <p class="text-sm text-secondary-500 mb-4">Hubungi Admin RT untuk mendaftarkan Kartu Keluarga Anda terlebih dahulu.</p>
+                    <a href="?page=keluarga" class="inline-block px-6 py-2 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700">Ke Data Keluarga</a>
+                </div>
+            <?php elseif (!$query_anggota || $query_anggota->num_rows == 0): ?>
+                <div class="text-center py-6">
+                    <i class="fas fa-users text-4xl text-secondary-300 mb-3"></i>
+                    <p class="font-bold text-secondary-900">Belum Ada Anggota Keluarga</p>
+                    <p class="text-sm text-secondary-500 mb-4">Tambahkan data anggota keluarga terlebih dahulu untuk bisa mengajukan surat.</p>
                     <a href="?page=keluarga" class="inline-block px-6 py-2 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700">Ke Data Keluarga</a>
                 </div>
             <?php else: ?>
                 <form method="POST" class="space-y-5">
                     <div>
                         <label class="block text-xs font-bold text-secondary-600 mb-1">Pilih Anggota Keluarga *</label>
-                        <select name="data_keluarga_id" required class="w-full px-4 py-3 bg-secondary-50 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary-500 transition-all text-secondary-900 font-medium">
-                            <option value="">-- Pilih --</option>
-                            <?php while($k = $query_keluarga->fetch_assoc()): ?>
+                        <select name="anggota_id" required class="w-full px-4 py-3 bg-secondary-50 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary-500 transition-all text-secondary-900 font-medium">
+                            <option value="">-- Pilih Anggota --</option>
+                            <?php while($k = $query_anggota->fetch_assoc()): ?>
                                 <option value="<?= $k['id'] ?>"><?= htmlspecialchars($k['nama_lengkap']) ?> (<?= $k['status_hubungan'] ?>)</option>
                             <?php endwhile; ?>
                         </select>
-                        <p class="text-[10px] text-secondary-400 mt-1"><i class="fas fa-info-circle mr-1"></i>Data KTP & KK anggota terpilih akan otomatis terlampir untuk Ketua RT.</p>
+                        <p class="text-[10px] text-secondary-400 mt-1"><i class="fas fa-info-circle mr-1"></i>Data KTP anggota terpilih akan otomatis terlampir untuk Ketua RT.</p>
                     </div>
 
                     <div>

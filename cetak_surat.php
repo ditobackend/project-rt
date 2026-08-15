@@ -9,11 +9,15 @@ if (!isset($_SESSION['user_id'])) {
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 $query = $conn->query("
-    SELECT sp.*, dk.nama_lengkap, dk.nik, dk.tempat_lahir, dk.tanggal_lahir, 
-           dk.jenis_kelamin, dk.agama, dk.pekerjaan, dk.status_perkawinan,
+    SELECT sp.*, 
+           ak.nama_lengkap, ak.nik, ak.tempat_lahir, ak.tanggal_lahir, 
+           ak.jenis_kelamin, ak.agama, ak.jenis_pekerjaan as pekerjaan, ak.status_perkawinan,
+           ak.golongan_darah, ak.kewarganegaraan, ak.nama_ayah, ak.nama_ibu,
+           kk.no_kk, kk.alamat as alamat_kk, kk.rt, kk.rw, kk.desa_kelurahan, kk.kecamatan,
            u.nama as nama_pengaju 
     FROM surat_pengantar sp 
-    JOIN data_keluarga dk ON sp.data_keluarga_id = dk.id 
+    JOIN anggota_keluarga ak ON sp.anggota_keluarga_id = ak.id 
+    JOIN kartu_keluarga kk ON ak.kk_id = kk.id
     JOIN users u ON sp.user_id = u.id 
     WHERE sp.id = $id AND sp.status = 'disetujui'
 ");
@@ -113,9 +117,9 @@ $nomor_surat = sprintf("%03d", $surat['id']) . "/RT06-RW08/" . date('m/Y', strto
             width: 2%;
         }
         .ttd-section {
-            margin-top: 50px;
+            margin-top: 25px;
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
         }
         .ttd-box {
             text-align: center;
@@ -166,6 +170,16 @@ $nomor_surat = sprintf("%03d", $surat['id']) . "/RT06-RW08/" . date('m/Y', strto
                     <td><strong><?= htmlspecialchars($surat['nama_lengkap']) ?></strong></td>
                 </tr>
                 <tr>
+                    <td>No. KK</td>
+                    <td>:</td>
+                    <td><?= htmlspecialchars($surat['no_kk']) ?></td>
+                </tr>
+                <tr>
+                    <td>NIK</td>
+                    <td>:</td>
+                    <td><?= htmlspecialchars($surat['nik']) ?></td>
+                </tr>
+                <tr>
                     <td>Tempat, Tanggal Lahir</td>
                     <td>:</td>
                     <td><?= htmlspecialchars($surat['tempat_lahir']) ?>, <?= date('d M Y', strtotime($surat['tanggal_lahir'])) ?></td>
@@ -181,19 +195,19 @@ $nomor_surat = sprintf("%03d", $surat['id']) . "/RT06-RW08/" . date('m/Y', strto
                     <td><?= htmlspecialchars($surat['agama']) ?></td>
                 </tr>
                 <tr>
-                    <td>Pekerjaan</td>
-                    <td>:</td>
-                    <td><?= htmlspecialchars($surat['pekerjaan']) ?></td>
-                </tr>
-                <tr>
                     <td>Status Perkawinan</td>
                     <td>:</td>
                     <td><?= htmlspecialchars($surat['status_perkawinan']) ?></td>
                 </tr>
                 <tr>
-                    <td>NIK</td>
+                    <td>Pekerjaan</td>
                     <td>:</td>
-                    <td><?= htmlspecialchars($surat['nik']) ?></td>
+                    <td><?= htmlspecialchars($surat['pekerjaan']) ?></td>
+                </tr>
+                <tr>
+                    <td>Alamat</td>
+                    <td>:</td>
+                    <td><?= htmlspecialchars($surat['alamat_kk']) ?>, RT <?= $surat['rt'] ?>/RW <?= $surat['rw'] ?>, <?= htmlspecialchars($surat['desa_kelurahan']) ?>, <?= htmlspecialchars($surat['kecamatan']) ?></td>
                 </tr>
             </table>
 
@@ -206,8 +220,14 @@ $nomor_surat = sprintf("%03d", $surat['id']) . "/RT06-RW08/" . date('m/Y', strto
 
         <div class="ttd-section">
             <div class="ttd-box">
-                <p>Serua Indah, <?= $tanggal_cetak ?></p>
-                <p>Ketua RT 06 / RW 08</p>
+                <p style="margin-bottom: 16px;">&nbsp;</p>
+                <p>Ketua RT 06</p>
+                <div class="ttd-space"></div>
+                <p class="nama-ttd">......................................</p>
+            </div>
+            <div class="ttd-box">
+                <p style="margin-bottom: 16px;">Serua Indah, <?= $tanggal_cetak ?></p>
+                <p>Ketua RW 08</p>
                 <div class="ttd-space"></div>
                 <p class="nama-ttd">......................................</p>
             </div>
