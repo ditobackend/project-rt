@@ -8,8 +8,12 @@ $kk_query = $conn->query("SELECT id, no_kk FROM kartu_keluarga WHERE user_id = $
 $kk_data  = $kk_query ? $kk_query->fetch_assoc() : null;
 $kk_id    = $kk_data ? $kk_data['id'] : 0;
 
-// Auto-patch database: pastikan data_keluarga_id bersifat NULLABLE agar INSERT tidak error
-@$conn->query("ALTER TABLE `surat_pengantar` MODIFY COLUMN `data_keluarga_id` INT NULL");
+// Auto-patch database: hapus tabel lama data_keluarga dan kolom legacy data_keluarga_id
+@$conn->query("DROP TABLE IF EXISTS `data_keluarga`");
+$checkCol = @$conn->query("SHOW COLUMNS FROM `surat_pengantar` LIKE 'data_keluarga_id'");
+if ($checkCol && $checkCol->num_rows > 0) {
+    @$conn->query("ALTER TABLE `surat_pengantar` DROP COLUMN `data_keluarga_id`");
+}
 
 // Handle Submit Pengajuan
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_surat'])) {

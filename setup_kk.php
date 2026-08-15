@@ -88,11 +88,24 @@ if ($checkCol->num_rows === 0) {
     $results[] = ['status' => 'SKIP', 'msg' => 'Kolom anggota_keluarga_id sudah ada di surat_pengantar.'];
 }
 
-// Pastikan data_keluarga_id bisa NULL jika kolom tersebut masih ada
+// Hapus foreign key & kolom legacy data_keluarga_id jika masih ada
+$fkCheck = $conn->query("SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'surat_pengantar' AND REFERENCED_TABLE_NAME = 'data_keluarga'");
+if ($fkCheck && $fkCheck->num_rows > 0) {
+    while ($row = $fkCheck->fetch_assoc()) {
+        $fkName = $row['CONSTRAINT_NAME'];
+        @$conn->query("ALTER TABLE `surat_pengantar` DROP FOREIGN KEY `$fkName`");
+    }
+}
+
 $checkOldCol = $conn->query("SHOW COLUMNS FROM `surat_pengantar` LIKE 'data_keluarga_id'");
 if ($checkOldCol && $checkOldCol->num_rows > 0) {
-    $conn->query("ALTER TABLE `surat_pengantar` MODIFY COLUMN `data_keluarga_id` INT NULL");
-    $results[] = ['status' => 'OK', 'msg' => 'Kolom lama data_keluarga_id diubah menjadi NULLABLE.'];
+    $conn->query("ALTER TABLE `surat_pengantar` DROP COLUMN `data_keluarga_id`");
+    $results[] = ['status' => 'OK', 'msg' => 'Kolom lama data_keluarga_id berhasil dihapus dari surat_pengantar.'];
+}
+
+// Hapus tabel lama data_keluarga jika masih ada
+if ($conn->query("DROP TABLE IF EXISTS `data_keluarga`")) {
+    $results[] = ['status' => 'OK', 'msg' => 'Tabel lama data_keluarga berhasil dihapus (DROP TABLE).'];
 }
 
 // ============================================================
