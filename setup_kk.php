@@ -48,9 +48,13 @@ $sql2 = "CREATE TABLE IF NOT EXISTS `anggota_keluarga` (
     `status_perkawinan` VARCHAR(50),
     `status_hubungan` VARCHAR(50) NOT NULL,
     `kewarganegaraan` VARCHAR(10) DEFAULT 'WNI',
+    `no_paspor` VARCHAR(50) DEFAULT '-',
+    `no_kitas` VARCHAR(50) DEFAULT '-',
     `nama_ayah` VARCHAR(100),
     `nama_ibu` VARCHAR(100),
     `foto_ktp` VARCHAR(255),
+    `foto_paspor` VARCHAR(255),
+    `foto_kitas` VARCHAR(255),
     `diinput_oleh` ENUM('admin','warga') DEFAULT 'admin',
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (`kk_id`) REFERENCES `kartu_keluarga`(`id`) ON DELETE CASCADE
@@ -61,6 +65,28 @@ if ($conn->query($sql2)) {
 } else {
     $results[] = ['status' => 'ERROR', 'msg' => 'Gagal buat anggota_keluarga: ' . $conn->error];
 }
+
+// Tambah kolom no_paspor, no_kitas, foto_paspor & foto_kitas jika belum ada
+$checkPaspor = $conn->query("SHOW COLUMNS FROM `anggota_keluarga` LIKE 'no_paspor'");
+if ($checkPaspor && $checkPaspor->num_rows === 0) {
+    $conn->query("ALTER TABLE `anggota_keluarga` ADD COLUMN `no_paspor` VARCHAR(50) DEFAULT '-' AFTER `kewarganegaraan`");
+}
+$checkKitas = $conn->query("SHOW COLUMNS FROM `anggota_keluarga` LIKE 'no_kitas'");
+if ($checkKitas && $checkKitas->num_rows === 0) {
+    $conn->query("ALTER TABLE `anggota_keluarga` ADD COLUMN `no_kitas` VARCHAR(50) DEFAULT '-' AFTER `no_paspor`");
+}
+$checkFotoPaspor = $conn->query("SHOW COLUMNS FROM `anggota_keluarga` LIKE 'foto_paspor'");
+if ($checkFotoPaspor && $checkFotoPaspor->num_rows === 0) {
+    $conn->query("ALTER TABLE `anggota_keluarga` ADD COLUMN `foto_paspor` VARCHAR(255) NULL AFTER `no_kitas`");
+}
+$checkFotoKitas = $conn->query("SHOW COLUMNS FROM `anggota_keluarga` LIKE 'foto_kitas'");
+if ($checkFotoKitas && $checkFotoKitas->num_rows === 0) {
+    $conn->query("ALTER TABLE `anggota_keluarga` ADD COLUMN `foto_kitas` VARCHAR(255) NULL AFTER `foto_paspor`");
+}
+
+// Update data lama yang kosong agar otomatis menjadi '-'
+$conn->query("UPDATE `anggota_keluarga` SET `no_paspor` = '-' WHERE `no_paspor` IS NULL OR TRIM(`no_paspor`) = ''");
+$conn->query("UPDATE `anggota_keluarga` SET `no_kitas` = '-' WHERE `no_kitas` IS NULL OR TRIM(`no_kitas`) = ''");
 
 // ============================================================
 // 3. Modifikasi tabel surat_pengantar

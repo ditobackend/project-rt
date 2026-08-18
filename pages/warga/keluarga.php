@@ -131,6 +131,18 @@ if ($kk_data) {
                 <span class="w-2/3 text-secondary-700 font-medium text-xs"><?= htmlspecialchars($row['jenis_pekerjaan']) ?></span>
             </div>
             <?php endif; ?>
+            <?php if (!empty($row['no_paspor'])): ?>
+            <div class="flex text-sm">
+                <span class="w-1/3 text-secondary-400 text-xs">Paspor</span>
+                <span class="w-2/3 text-secondary-700 font-medium text-xs"><?= htmlspecialchars($row['no_paspor']) ?></span>
+            </div>
+            <?php endif; ?>
+            <?php if (!empty($row['no_kitas'])): ?>
+            <div class="flex text-sm">
+                <span class="w-1/3 text-secondary-400 text-xs">KITAS/KITAP</span>
+                <span class="w-2/3 text-secondary-700 font-medium text-xs"><?= htmlspecialchars($row['no_kitas']) ?></span>
+            </div>
+            <?php endif; ?>
             <?php if ($row['nama_ayah'] || $row['nama_ibu']): ?>
             <div class="flex text-sm">
                 <span class="w-1/3 text-secondary-400 text-xs">Orang Tua</span>
@@ -142,12 +154,28 @@ if ($kk_data) {
             <?php endif; ?>
         </div>
 
-        <!-- Foto Kartu Identitas Link -->
-        <?php if ($row['foto_ktp']): ?>
-        <a href="<?= htmlspecialchars($row['foto_ktp']) ?>" target="_blank"
-            class="w-full text-center py-2 text-xs font-bold bg-secondary-50 text-secondary-600 rounded-xl hover:bg-secondary-100 transition-colors block">
-            <i class="fas fa-image mr-1"></i> Lihat Kartu Identitas
-        </a>
+        <!-- Foto / Dokumen Links -->
+        <?php if ($row['foto_ktp'] || !empty($row['foto_paspor']) || !empty($row['foto_kitas'])): ?>
+        <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-secondary-100">
+            <?php if ($row['foto_ktp']): ?>
+            <a href="<?= htmlspecialchars($row['foto_ktp']) ?>" target="_blank"
+                class="flex-1 text-center py-2 text-xs font-bold bg-secondary-50 text-secondary-600 rounded-xl hover:bg-secondary-100 transition-colors">
+                <i class="fas fa-id-card mr-1"></i> KTP
+            </a>
+            <?php endif; ?>
+            <?php if (!empty($row['foto_paspor'])): ?>
+            <a href="<?= htmlspecialchars($row['foto_paspor']) ?>" target="_blank"
+                class="flex-1 text-center py-2 text-xs font-bold bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors">
+                <i class="fas fa-passport mr-1"></i> Paspor
+            </a>
+            <?php endif; ?>
+            <?php if (!empty($row['foto_kitas'])): ?>
+            <a href="<?= htmlspecialchars($row['foto_kitas']) ?>" target="_blank"
+                class="flex-1 text-center py-2 text-xs font-bold bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-100 transition-colors">
+                <i class="fas fa-file-contract mr-1"></i> KITAS
+            </a>
+            <?php endif; ?>
+        </div>
         <?php endif; ?>
     </div>
     <?php endwhile; ?>

@@ -1,4 +1,48 @@
 <?php
+require_once __DIR__ . '/../../config/database.php';
+
+// Auto-migrate: tambah kolom order_id di keuangan & laporan jika belum ada
+$check_col = $conn->query("SHOW COLUMNS FROM keuangan LIKE 'order_id'");
+if ($check_col && $check_col->num_rows == 0) {
+    $conn->query("ALTER TABLE keuangan ADD COLUMN order_id VARCHAR(100) NULL DEFAULT NULL AFTER jumlah");
+    $conn->query("ALTER TABLE laporan ADD COLUMN order_id VARCHAR(100) NULL DEFAULT NULL AFTER jumlah");
+}
+
+// Auto-sync: semua pembayaran berhasil yang belum masuk ke keuangan
+$sync_sql = "SELECT p.*, u.nama 
+            FROM pembayaran p 
+            JOIN users u ON p.user_id = u.id 
+            WHERE p.status = 'berhasil'";
+$res_sync = $conn->query($sync_sql);
+if ($res_sync && $res_sync->num_rows > 0) {
+    while ($row_s = $res_sync->fetch_assoc()) {
+        $nama_s     = $row_s['nama'];
+        $kategori_s = $row_s['kategori'];
+        $jumlah_s   = $row_s['jumlah'];
+        $order_id_s = $row_s['order_id'];
+        $tanggal_s  = date('Y-m-d', strtotime($row_s['tanggal']));
+        $keterangan_s = mb_substr("$nama_s - $kategori_s", 0, 255);
+
+        $cek_s = $conn->prepare("SELECT id FROM keuangan WHERE order_id = ?");
+        $cek_s->bind_param("s", $order_id_s);
+        $cek_s->execute();
+        $existing_s = $cek_s->get_result();
+        $cek_s->close();
+
+        if ($existing_s->num_rows === 0) {
+            $ins_s = $conn->prepare("INSERT INTO keuangan (tanggal, keterangan, jenis, jumlah, order_id) VALUES (?, ?, 'pemasukan', ?, ?)");
+            $ins_s->bind_param("ssds", $tanggal_s, $keterangan_s, $jumlah_s, $order_id_s);
+            if ($ins_s->execute()) {
+                $stmt_l = $conn->prepare("INSERT INTO laporan (tanggal, keterangan, jenis, jumlah, order_id) VALUES (?, ?, 'pemasukan', ?, ?)");
+                $stmt_l->bind_param("ssds", $tanggal_s, $keterangan_s, $jumlah_s, $order_id_s);
+                $stmt_l->execute();
+                $stmt_l->close();
+            }
+            $ins_s->close();
+        }
+    }
+}
+
 $filter_jenis = $_GET['filter_jenis'] ?? '';
 $filter_bulan = $_GET['filter_bulan'] ?? '';
 $where = [];

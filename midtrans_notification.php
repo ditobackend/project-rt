@@ -63,27 +63,35 @@ if ($result->num_rows > 0) {
 
     // Jika berhasil, tambahkan ke keuangan sebagai pemasukan (hindari duplikasi)
     if ($status == 'berhasil') {
-        $keterangan = "$nama - $kategori - $catatan";
-        $cek_keuangan = $conn->prepare("SELECT id FROM keuangan WHERE keterangan = ?");
-        $cek_keuangan->bind_param("s", $keterangan);
+        // Pastikan kolom order_id ada
+        $chk = $conn->query("SHOW COLUMNS FROM keuangan LIKE 'order_id'");
+        if ($chk && $chk->num_rows == 0) {
+            $conn->query("ALTER TABLE keuangan ADD COLUMN order_id VARCHAR(100) NULL DEFAULT NULL");
+            $conn->query("ALTER TABLE laporan ADD COLUMN order_id VARCHAR(100) NULL DEFAULT NULL");
+        }
+
+        $keterangan = mb_substr("$nama - $kategori", 0, 255);
+
+        // Cek duplikasi berdasarkan order_id
+        $cek_keuangan = $conn->prepare("SELECT id FROM keuangan WHERE order_id = ?");
+        $cek_keuangan->bind_param("s", $order_id);
         $cek_keuangan->execute();
         $existing = $cek_keuangan->get_result();
         $sudahTerekam = $existing->num_rows > 0;
+        $cek_keuangan->close();
 
         if (!$sudahTerekam) {
-            $keuangan_stmt = $conn->prepare("INSERT INTO keuangan (tanggal, keterangan, jenis, jumlah) VALUES (CURDATE(), ?, 'pemasukan', ?)");
-            $keuangan_stmt->bind_param("sd", $keterangan, $jumlah);
+            $keuangan_stmt = $conn->prepare("INSERT INTO keuangan (tanggal, keterangan, jenis, jumlah, order_id) VALUES (CURDATE(), ?, 'pemasukan', ?, ?)");
+            $keuangan_stmt->bind_param("sds", $keterangan, $jumlah, $order_id);
             $keuangan_stmt->execute();
             $keuangan_stmt->close();
 
             // Simpan ke Riwayat Laporan (Consolidated)
-            $stmt_l = $conn->prepare("INSERT INTO laporan (tanggal, keterangan, jenis, jumlah) VALUES (CURDATE(), ?, 'pemasukan', ?)");
-            $stmt_l->bind_param("sd", $keterangan, $jumlah);
+            $stmt_l = $conn->prepare("INSERT INTO laporan (tanggal, keterangan, jenis, jumlah, order_id) VALUES (CURDATE(), ?, 'pemasukan', ?, ?)");
+            $stmt_l->bind_param("sds", $keterangan, $jumlah, $order_id);
             $stmt_l->execute();
             $stmt_l->close();
         }
-
-        $cek_keuangan->close();
     }
 
     $stmt->close();

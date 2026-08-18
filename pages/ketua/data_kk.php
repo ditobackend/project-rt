@@ -265,13 +265,27 @@ const modalViewMemberContent = document.getElementById('modalViewMemberContent')
 
 function viewMemberDetail(data) {
     let fotoHtml = '';
-    if (data.foto_ktp) {
+    if (data.foto_ktp || data.foto_paspor || data.foto_kitas) {
         fotoHtml = `
             <div class="mt-6 mb-2">
-                <h4 class="text-xs font-black text-secondary-400 uppercase tracking-widest mb-3 border-b border-secondary-100 pb-2">Dokumen Kartu Identitas</h4>
-                <a href="${data.foto_ktp}" target="_blank" class="block w-48 h-32 rounded-xl overflow-hidden border-2 border-secondary-100 shadow-sm hover:shadow-md transition-all">
-                    <img src="${data.foto_ktp}" alt="Kartu Identitas ${data.nama_lengkap}" class="w-full h-full object-cover">
-                </a>
+                <h4 class="text-xs font-black text-secondary-400 uppercase tracking-widest mb-3 border-b border-secondary-100 pb-2">Dokumen Terlampir</h4>
+                <div class="flex flex-wrap gap-4">
+                    ${data.foto_ktp ? `
+                    <a href="${data.foto_ktp}" target="_blank" class="block w-40 h-28 rounded-xl overflow-hidden border-2 border-secondary-100 shadow-sm hover:shadow-md transition-all relative group">
+                        <img src="${data.foto_ktp}" alt="KTP" class="w-full h-full object-cover">
+                        <span class="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[10px] font-bold text-center py-1">Kartu Identitas / KTP</span>
+                    </a>` : ''}
+                    ${data.foto_paspor ? `
+                    <a href="${data.foto_paspor}" target="_blank" class="block w-40 h-28 rounded-xl overflow-hidden border-2 border-secondary-100 shadow-sm hover:shadow-md transition-all relative group">
+                        <img src="${data.foto_paspor}" alt="Paspor" class="w-full h-full object-cover">
+                        <span class="absolute bottom-0 inset-x-0 bg-blue-900/70 text-white text-[10px] font-bold text-center py-1">Paspor</span>
+                    </a>` : ''}
+                    ${data.foto_kitas ? `
+                    <a href="${data.foto_kitas}" target="_blank" class="block w-40 h-28 rounded-xl overflow-hidden border-2 border-secondary-100 shadow-sm hover:shadow-md transition-all relative group">
+                        <img src="${data.foto_kitas}" alt="KITAS" class="w-full h-full object-cover">
+                        <span class="absolute bottom-0 inset-x-0 bg-purple-900/70 text-white text-[10px] font-bold text-center py-1">KITAS / KITAP</span>
+                    </a>` : ''}
+                </div>
             </div>
         `;
     }
@@ -330,6 +344,15 @@ function viewMemberDetail(data) {
             <div>
                 <p class="text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-1">Diinput Oleh</p>
                 <p class="text-secondary-800 uppercase text-xs font-bold">${data.diinput_oleh}</p>
+            </div>
+
+            <div>
+                <p class="text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-1">No. Paspor</p>
+                <p class="text-secondary-800">${data.no_paspor || '-'}</p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-1">No. KITAS / KITAP</p>
+                <p class="text-secondary-800">${data.no_kitas || '-'}</p>
             </div>
         </div>
 

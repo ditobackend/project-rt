@@ -26,12 +26,40 @@ if (isset($_GET['ajax_kk'])) {
 }
 
 // ============================================================
+// Auto-migrate database columns for Paspor & KITAS
+// ============================================================
+$checkPaspor = $conn->query("SHOW COLUMNS FROM `anggota_keluarga` LIKE 'no_paspor'");
+if ($checkPaspor && $checkPaspor->num_rows === 0) {
+    $conn->query("ALTER TABLE `anggota_keluarga` ADD COLUMN `no_paspor` VARCHAR(50) DEFAULT '-' AFTER `kewarganegaraan`");
+}
+$checkKitas = $conn->query("SHOW COLUMNS FROM `anggota_keluarga` LIKE 'no_kitas'");
+if ($checkKitas && $checkKitas->num_rows === 0) {
+    $conn->query("ALTER TABLE `anggota_keluarga` ADD COLUMN `no_kitas` VARCHAR(50) DEFAULT '-' AFTER `no_paspor`");
+}
+$checkFotoPaspor = $conn->query("SHOW COLUMNS FROM `anggota_keluarga` LIKE 'foto_paspor'");
+if ($checkFotoPaspor && $checkFotoPaspor->num_rows === 0) {
+    $conn->query("ALTER TABLE `anggota_keluarga` ADD COLUMN `foto_paspor` VARCHAR(255) NULL AFTER `no_kitas`");
+}
+$checkFotoKitas = $conn->query("SHOW COLUMNS FROM `anggota_keluarga` LIKE 'foto_kitas'");
+if ($checkFotoKitas && $checkFotoKitas->num_rows === 0) {
+    $conn->query("ALTER TABLE `anggota_keluarga` ADD COLUMN `foto_kitas` VARCHAR(255) NULL AFTER `foto_paspor`");
+}
+
+// Update data lama yang kosong agar otomatis menjadi '-'
+$conn->query("UPDATE `anggota_keluarga` SET `no_paspor` = '-' WHERE `no_paspor` IS NULL OR TRIM(`no_paspor`) = ''");
+$conn->query("UPDATE `anggota_keluarga` SET `no_kitas` = '-' WHERE `no_kitas` IS NULL OR TRIM(`no_kitas`) = ''");
+
+// ============================================================
 // Upload folder
 // ============================================================
-$upload_kk  = __DIR__ . '/../../uploads/foto_kk_kartu/';
-$upload_ktp = __DIR__ . '/../../uploads/ktp/';
-if (!is_dir($upload_kk))  mkdir($upload_kk,  0777, true);
-if (!is_dir($upload_ktp)) mkdir($upload_ktp, 0777, true);
+$upload_kk     = __DIR__ . '/../../uploads/foto_kk_kartu/';
+$upload_ktp    = __DIR__ . '/../../uploads/ktp/';
+$upload_paspor = __DIR__ . '/../../uploads/paspor/';
+$upload_kitas  = __DIR__ . '/../../uploads/kitas/';
+if (!is_dir($upload_kk))     mkdir($upload_kk,     0777, true);
+if (!is_dir($upload_ktp))    mkdir($upload_ktp,    0777, true);
+if (!is_dir($upload_paspor)) mkdir($upload_paspor, 0777, true);
+if (!is_dir($upload_kitas))  mkdir($upload_kitas,  0777, true);
 
 // ============================================================
 // DELETE KK
@@ -54,10 +82,14 @@ if (isset($_GET['hapus_kk'])) {
 if (isset($_GET['hapus_anggota'])) {
     $id_del = (int)$_GET['hapus_anggota'];
     $kk_back = (int)($_GET['kk_id'] ?? 0);
-    $q = $conn->query("SELECT foto_ktp FROM anggota_keluarga WHERE id=$id_del");
+    $q = $conn->query("SELECT foto_ktp, foto_paspor, foto_kitas FROM anggota_keluarga WHERE id=$id_del");
     if ($q && $row_f = $q->fetch_assoc()) {
         if ($row_f['foto_ktp'] && file_exists(__DIR__.'/../../'.$row_f['foto_ktp']))
             unlink(__DIR__.'/../../'.$row_f['foto_ktp']);
+        if ($row_f['foto_paspor'] && file_exists(__DIR__.'/../../'.$row_f['foto_paspor']))
+            unlink(__DIR__.'/../../'.$row_f['foto_paspor']);
+        if ($row_f['foto_kitas'] && file_exists(__DIR__.'/../../'.$row_f['foto_kitas']))
+            unlink(__DIR__.'/../../'.$row_f['foto_kitas']);
     }
     $conn->query("DELETE FROM anggota_keluarga WHERE id=$id_del");
     $_SESSION['flash_msg'] = "<div class='p-3 mb-4 bg-green-50 text-green-700 rounded-xl border border-green-200 text-sm font-bold'>Data anggota berhasil dihapus.</div>";
@@ -128,6 +160,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_anggota'])) {
     $status_kaw = $conn->real_escape_string($_POST['status_perkawinan']);
     $status_hub = $conn->real_escape_string($_POST['status_hubungan']);
     $wn         = $conn->real_escape_string($_POST['kewarganegaraan']);
+    $paspor     = isset($_POST['no_paspor']) && trim($_POST['no_paspor']) !== '' ? $conn->real_escape_string(trim($_POST['no_paspor'])) : '-';
+    $kitas      = isset($_POST['no_kitas']) && trim($_POST['no_kitas']) !== '' ? $conn->real_escape_string(trim($_POST['no_kitas'])) : '-';
     $ayah       = $conn->real_escape_string(trim($_POST['nama_ayah']));
     $ibu        = $conn->real_escape_string(trim($_POST['nama_ibu']));
 
@@ -141,20 +175,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_anggota'])) {
         $update_foto_sql = ", foto_ktp='$foto_ktp_val'";
     }
 
+    $foto_paspor_val = '';
+    $update_foto_paspor_sql = '';
+    if (isset($_FILES['foto_paspor']) && $_FILES['foto_paspor']['error'] == 0) {
+        $ext = strtolower(pathinfo($_FILES['foto_paspor']['name'], PATHINFO_EXTENSION));
+        $fname = 'PASPOR_' . $nik . '_' . time() . '.' . $ext;
+        move_uploaded_file($_FILES['foto_paspor']['tmp_name'], $upload_paspor . $fname);
+        $foto_paspor_val = 'uploads/paspor/' . $fname;
+        $update_foto_paspor_sql = ", foto_paspor='$foto_paspor_val'";
+    }
+
+    $foto_kitas_val = '';
+    $update_foto_kitas_sql = '';
+    if (isset($_FILES['foto_kitas']) && $_FILES['foto_kitas']['error'] == 0) {
+        $ext = strtolower(pathinfo($_FILES['foto_kitas']['name'], PATHINFO_EXTENSION));
+        $fname = 'KITAS_' . $nik . '_' . time() . '.' . $ext;
+        move_uploaded_file($_FILES['foto_kitas']['tmp_name'], $upload_kitas . $fname);
+        $foto_kitas_val = 'uploads/kitas/' . $fname;
+        $update_foto_kitas_sql = ", foto_kitas='$foto_kitas_val'";
+    }
+
     if ($id_ang) {
         $sql = "UPDATE anggota_keluarga SET nik='$nik', nama_lengkap='$nama', tempat_lahir='$tempat',
                 tanggal_lahir='$tgl', jenis_kelamin='$jk', golongan_darah='$goldar', agama='$agama',
                 pendidikan='$pendidikan', jenis_pekerjaan='$pekerjaan', status_perkawinan='$status_kaw',
-                status_hubungan='$status_hub', kewarganegaraan='$wn', nama_ayah='$ayah', nama_ibu='$ibu'
-                $update_foto_sql WHERE id=$id_ang";
+                status_hubungan='$status_hub', kewarganegaraan='$wn', no_paspor='$paspor', no_kitas='$kitas',
+                nama_ayah='$ayah', nama_ibu='$ibu'
+                $update_foto_sql $update_foto_paspor_sql $update_foto_kitas_sql WHERE id=$id_ang";
         $conn->query($sql);
         $_SESSION['flash_msg'] = "<div class='p-3 mb-4 bg-blue-50 text-blue-700 rounded-xl border border-blue-200 text-sm font-bold'>Data anggota berhasil diperbarui.</div>";
     } else {
         $sql = "INSERT INTO anggota_keluarga (kk_id, nik, nama_lengkap, tempat_lahir, tanggal_lahir,
                 jenis_kelamin, golongan_darah, agama, pendidikan, jenis_pekerjaan, status_perkawinan,
-                status_hubungan, kewarganegaraan, nama_ayah, nama_ibu, foto_ktp, diinput_oleh)
+                status_hubungan, kewarganegaraan, no_paspor, no_kitas, nama_ayah, nama_ibu, foto_ktp, foto_paspor, foto_kitas, diinput_oleh)
                 VALUES ($kk_id, '$nik', '$nama', '$tempat', '$tgl', '$jk', '$goldar', '$agama',
-                '$pendidikan', '$pekerjaan', '$status_kaw', '$status_hub', '$wn', '$ayah', '$ibu', '$foto_ktp_val', 'admin')";
+                '$pendidikan', '$pekerjaan', '$status_kaw', '$status_hub', '$wn', '$paspor', '$kitas', '$ayah', '$ibu', '$foto_ktp_val', '$foto_paspor_val', '$foto_kitas_val', 'admin')";
         if ($conn->query($sql)) {
             $_SESSION['flash_msg'] = "<div class='p-3 mb-4 bg-green-50 text-green-700 rounded-xl border border-green-200 text-sm font-bold'>Data anggota berhasil ditambahkan.</div>";
         } else {
@@ -622,6 +677,20 @@ unset($_SESSION['open_kk']);
                         </select>
                     </div>
 
+                    <!-- No. Paspor -->
+                    <div>
+                        <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-1.5">No. Paspor</label>
+                        <input type="text" name="no_paspor" id="a_paspor" placeholder="Isi - jika tidak ada" value="-"
+                            class="w-full px-4 py-3 bg-secondary-50 rounded-xl border-0 focus:ring-2 focus:ring-emerald-500 text-secondary-900 font-medium">
+                    </div>
+
+                    <!-- No. KITAS / KITAP -->
+                    <div>
+                        <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-1.5">No. KITAS / KITAP</label>
+                        <input type="text" name="no_kitas" id="a_kitas" placeholder="Isi - jika tidak ada" value="-"
+                            class="w-full px-4 py-3 bg-secondary-50 rounded-xl border-0 focus:ring-2 focus:ring-emerald-500 text-secondary-900 font-medium">
+                    </div>
+
                     <!-- Nama Ayah -->
                     <div>
                         <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-1.5">Nama Ayah <span class="text-red-500">*</span></label>
@@ -638,10 +707,26 @@ unset($_SESSION['open_kk']);
 
                     <!-- Foto Kartu Identitas -->
                     <div class="md:col-span-2">
-                        <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-1.5">Foto / Scan Kartu Identitas</label>
-                        <input type="file" name="foto_ktp" accept="image/*"
+                        <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-1.5">Foto / Scan Kartu Identitas / KTP</label>
+                        <input type="file" name="foto_ktp" accept="image/*,.pdf"
                             class="w-full px-4 py-3 bg-secondary-50 rounded-xl border-0 focus:ring-2 focus:ring-emerald-500 text-secondary-700 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-emerald-100 file:text-emerald-700 file:font-bold file:text-xs">
                         <p id="foto_ktp_current" class="text-xs text-secondary-400 mt-1"></p>
+                    </div>
+
+                    <!-- Foto Paspor (Opsional) -->
+                    <div>
+                        <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-1.5">Foto / Scan Paspor <span class="text-secondary-400 font-normal text-[9px] lowercase">(opsional)</span></label>
+                        <input type="file" name="foto_paspor" accept="image/*,.pdf"
+                            class="w-full px-4 py-3 bg-secondary-50 rounded-xl border-0 focus:ring-2 focus:ring-emerald-500 text-secondary-700 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-blue-100 file:text-blue-700 file:font-bold file:text-xs">
+                        <p id="foto_paspor_current" class="text-xs text-secondary-400 mt-1"></p>
+                    </div>
+
+                    <!-- Foto KITAS / KITAP (Opsional) -->
+                    <div>
+                        <label class="block text-[10px] font-black text-secondary-400 uppercase tracking-widest mb-1.5">Foto / Scan KITAS / KITAP <span class="text-secondary-400 font-normal text-[9px] lowercase">(opsional)</span></label>
+                        <input type="file" name="foto_kitas" accept="image/*,.pdf"
+                            class="w-full px-4 py-3 bg-secondary-50 rounded-xl border-0 focus:ring-2 focus:ring-emerald-500 text-secondary-700 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-purple-100 file:text-purple-700 file:font-bold file:text-xs">
+                        <p id="foto_kitas_current" class="text-xs text-secondary-400 mt-1"></p>
                     </div>
                 </div>
 
@@ -776,14 +861,20 @@ function renderAnggotaTable(anggota, kkId) {
             : `<span class="ml-1 text-[9px] font-black bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full uppercase">Warga</span>`;
 
         const ktpLink = a.foto_ktp
-            ? `<a href="${a.foto_ktp}" target="_blank" class="text-[10px] font-bold bg-secondary-100 text-secondary-600 px-2 py-0.5 rounded hover:bg-secondary-200">Kartu Identitas</a>`
+            ? `<a href="${a.foto_ktp}" target="_blank" class="text-[10px] font-bold bg-secondary-100 text-secondary-600 px-2 py-0.5 rounded hover:bg-secondary-200 mr-1 inline-block">KTP</a>`
+            : '';
+        const pasporLink = a.foto_paspor
+            ? `<a href="${a.foto_paspor}" target="_blank" class="text-[10px] font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded hover:bg-blue-200 mr-1 inline-block">Paspor</a>`
+            : '';
+        const kitasLink = a.foto_kitas
+            ? `<a href="${a.foto_kitas}" target="_blank" class="text-[10px] font-bold bg-purple-100 text-purple-600 px-2 py-0.5 rounded hover:bg-purple-200 inline-block">KITAS</a>`
             : '';
 
         html += `<tr class="hover:bg-secondary-50/50 transition-colors">
             <td class="px-3 py-3">
                 <p class="font-bold text-secondary-900">${a.nama_lengkap} ${badge}</p>
                 <p class="text-xs text-secondary-400 font-mono">${a.nik}</p>
-                ${ktpLink}
+                <div class="mt-1 flex flex-wrap gap-1">${ktpLink}${pasporLink}${kitasLink}</div>
             </td>
             <td class="px-3 py-3 text-secondary-600 font-medium">${a.status_hubungan}</td>
             <td class="px-3 py-3 text-secondary-600 text-xs">${a.tempat_lahir},<br>${a.tanggal_lahir}</td>
@@ -842,7 +933,11 @@ function openModalAnggota(kkId, noKk) {
     document.getElementById('anggota_id_hidden').value = '';
     document.getElementById('kk_id_anggota_hidden').value = kkId;
     document.getElementById('formAnggota').reset();
+    document.getElementById('a_paspor').value = '-';
+    document.getElementById('a_kitas').value = '-';
     document.getElementById('foto_ktp_current').textContent = '';
+    document.getElementById('foto_paspor_current').textContent = '';
+    document.getElementById('foto_kitas_current').textContent = '';
     modalAnggota.classList.remove('hidden');
     setTimeout(() => {
         modalAnggotaContent.classList.remove('scale-95','opacity-0');
@@ -866,11 +961,13 @@ function editAnggota(data, kkId) {
     document.getElementById('a_status_kaw').value = data.status_perkawinan || '';
     document.getElementById('a_status_hub').value = data.status_hubungan;
     document.getElementById('a_wn').value = data.kewarganegaraan || 'WNI';
+    document.getElementById('a_paspor').value = data.no_paspor || '-';
+    document.getElementById('a_kitas').value = data.no_kitas || '-';
     document.getElementById('a_ayah').value = data.nama_ayah || '';
     document.getElementById('a_ibu').value = data.nama_ibu || '';
-    if (data.foto_ktp) {
-        document.getElementById('foto_ktp_current').textContent = 'File saat ini: ' + data.foto_ktp;
-    }
+    document.getElementById('foto_ktp_current').textContent = data.foto_ktp ? 'File KTP: ' + data.foto_ktp : '';
+    document.getElementById('foto_paspor_current').textContent = data.foto_paspor ? 'File Paspor: ' + data.foto_paspor : '';
+    document.getElementById('foto_kitas_current').textContent = data.foto_kitas ? 'File KITAS: ' + data.foto_kitas : '';
     modalAnggota.classList.remove('hidden');
     setTimeout(() => {
         modalAnggotaContent.classList.remove('scale-95','opacity-0');
