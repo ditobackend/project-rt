@@ -26,7 +26,7 @@ Sistem Informasi Administrasi RT merupakan aplikasi berbasis web yang dikembangk
 3. Buat database MySQL.
 4. Import file database yang tersedia.
 5. Sesuaikan konfigurasi database.
-6. Jalankan Apache dan MySQL melalui XAMPP.
+6. Jalankan Apache dan MySQL melalui XAMPP (bisa juga pakai Laragon).
 7. Buka project melalui browser.
 
 ## Pengembang
